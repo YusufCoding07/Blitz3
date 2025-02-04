@@ -1,0 +1,14 @@
+﻿{% extends 'main/base.html' %}
+{% block title %}Profile - Blitz{% endblock %}
+
+{% block content %}
+<h1>Profile</h1>
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">{{ user.username }}</h5>
+        <p class="card-text">Location: {{ profile.location }}</p>
+        <p class="card-text">Driver Status: {% if profile.is_driver %}Active{% else %}Inactive{% endif %}</p>
+        <a href="#" class="btn btn-secondary">Edit Profile</a>
+    </div>
+</div>
+{% endblock %}

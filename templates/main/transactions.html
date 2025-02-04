@@ -1,0 +1,14 @@
+﻿{% extends 'main/base.html' %}
+{% block title %}Transactions - Blitz{% endblock %}
+
+{% block content %}
+<h1>Transactions</h1>
+<div class="list-group">
+    {% for transaction in transactions %}
+    <div class="list-group-item">
+        <h5>Amount: £{{ transaction.amount }}</h5>
+        <small>Date: {{ transaction.date }}</small>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

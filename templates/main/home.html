@@ -1,0 +1,20 @@
+﻿{% extends 'main/base.html' %}
+{% block title %}Find a Ride - Blitz{% endblock %}
+
+{% block content %}
+<h1>Find a Ride</h1>
+<div class="row">
+    {% for ride in rides %}
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">From {{ ride.start_location }} to {{ ride.end_location }}</h5>
+                <p class="card-text">Fare: £{{ ride.fare }}</p>
+                <p class="card-text">Driver: {{ ride.driver.username }}</p>
+                <a href="#" class="btn btn-primary">Request Ride</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

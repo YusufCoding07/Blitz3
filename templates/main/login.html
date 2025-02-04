@@ -1,0 +1,12 @@
+﻿{% extends 'main/base.html' %}
+{% block title %}Login - Blitz{% endblock %}
+
+{% block content %}
+<h1>Login</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Login</button>
+</form>
+<p class="mt-3">Don't have an account? <a href="{% url 'signup' %}">Sign up here</a>.</p>
+{% endblock %}
