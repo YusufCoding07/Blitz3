@@ -58,6 +58,7 @@ TEMPLATES = [
         'DIRS': [BASE_DIR / 'templates'],  # For custom templates
         'APP_DIRS': True,  # REQUIRED FOR ADMIN TEMPLATES
         'OPTIONS': {
+            'debug': True,  # Add temporarily
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
