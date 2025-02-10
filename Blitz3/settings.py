@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-     'main',  # added
+    'main',  # added
 ]
 
 MIDDLEWARE = [
@@ -55,7 +55,8 @@ ROOT_URLCONF = 'Blitz3.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  #added
+        'DIRS': [BASE_DIR / 'templates'],  # For custom templates
+        'APP_DIRS': True,  # REQUIRED FOR ADMIN TEMPLATES
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',

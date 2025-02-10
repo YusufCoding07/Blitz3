@@ -1,56 +1,22 @@
 ﻿{% extends 'main/base.html' %}
-{% load static %}
-{% block content %}
-<div class="container my-5">
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card shadow">
-                <div class="card-body text-center">
-                    <img src="{% static 'images/user-avatar.jpg' %}"
-                         class="rounded-circle mb-3"
-                         width="150"
-                         height="150"
-                         alt="Profile">
-                    <h3>{{ user.username }}</h3>
-                    <p class="text-muted">{{ profile.location }}</p>
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-primary">
-                            <i class="fa-solid fa-pen-to-square"></i> Edit Profile
-                        </button>
-                        {% if profile.is_driver %}
-                        <button class="btn btn-success">
-                            <i class="fa-solid fa-car"></i> Driver Mode
-                        </button>
-                        {% else %}
-                        <button class="btn btn-outline-success">
-                            <i class="fa-solid fa-car"></i> Become Driver
-                        </button>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-body">
-                    <h4 class="mb-4">Ride History</h4>
-                    <div class="list-group">
-                        {% for ride in rides %}
-                        <div class="list-group-item">
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    <h6>{{ ride.start_location }} → {{ ride.end_location }}</h6>
-                                    <small class="text-muted">{{ ride.date }}</small>
-                                </div>
-                                <div class="text-end">
-                                    <h5>£{{ ride.fare }}</h5>
-                                    <span class="badge bg-success">Completed</span>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">{{ profile.user.username }}'s Profile</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="{{ profile.profile_picture.url }}"
+                         class="img-fluid rounded-circle"
+                         alt="Profile Picture">
+                </div>
+                <div class="col-md-8">
+                    <p><strong>Email:</strong> {{ profile.user.email }}</p>
+                    <p><strong>Phone:</strong> {{ profile.phone_number }}</p>
+                    {% if profile.is_driver %}
+                    <span class="badge bg-success">Driver Account</span>
+                    {% endif %}
                 </div>
             </div>
         </div>
