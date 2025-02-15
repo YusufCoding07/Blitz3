@@ -9,7 +9,7 @@ class Profile(models.Model):
     phone_number = models.CharField(max_length=20, blank=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True)
     is_driver = models.BooleanField(default=False)
-    
+
     def __str__(self):
         return f"{self.user.username}'s Profile"
     
@@ -36,3 +36,4 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
+    
