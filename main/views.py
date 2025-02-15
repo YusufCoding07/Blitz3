@@ -1,24 +1,29 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
+from .models import Transaction  # Import your models if needed
 
 # Home Page (Find Ride)
 def home(request):
     return render(request, 'main/home.html')
 
 # Profile Page
+@login_required
 def profile(request):
-    return render(request, 'main/profile.html')
+    user_profile = request.user.profile  # Access the profile
+    return render(request, 'main/profile.html', {'profile': user_profile})
 
 # Map Page
 def map_view(request):
     return render(request, 'main/map.html')
 
+# Transactions Page
 def transactions(request):
     transactions = Transaction.objects.filter(user=request.user)  # Example query
     return render(request, 'main/transactions.html', {'transactions': transactions})
 
-from django.contrib.auth import login
-from django.contrib.auth.forms import UserCreationForm
-
+# Signup Page
 def signup(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -30,8 +35,7 @@ def signup(request):
         form = UserCreationForm()
     return render(request, 'registration/signup.html', {'form': form})
 
-from django.contrib.auth import authenticate, login
-
+# Login Page
 def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -42,15 +46,7 @@ def login_view(request):
             return redirect('home')
     return render(request, 'registration/login.html')
 
-from django.contrib.auth import logout
-
+# Logout Page
 def logout_view(request):
     logout(request)
     return redirect('home')
-
-from django.contrib.auth.decorators import login_required
-
-@login_required
-def profile(request):
-    user_profile = request.user.profile  # Access the profile
-    return render(request, 'main/profile.html', {'profile': user_profile})
