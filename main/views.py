@@ -11,7 +11,7 @@ def home(request):
 # Profile Page
 @login_required
 def profile(request):
-    user_profile = request.user.profile  # Access the profile
+    user_profile, created = Profile.objects.get_or_create(user=request.user)
     return render(request, 'main/profile.html', {'profile': user_profile})
 
 # Map Page
@@ -20,7 +20,7 @@ def map_view(request):
 
 # Transactions Page
 def transactions(request):
-    transactions = Transaction.objects.filter(user=request.user)  # Example query
+    transactions = []  # Use an empty list for now
     return render(request, 'main/transactions.html', {'transactions': transactions})
 
 # Signup Page
