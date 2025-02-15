@@ -12,7 +12,3 @@ def create_user_profile(sender, instance, created, **kwargs):
         except IntegrityError:
             # Profile already exists (edge case)
             pass
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
