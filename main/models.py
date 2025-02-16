@@ -1,4 +1,4 @@
-from django.db import models
+﻿from django.db import models
 
 # Create your models here.
 from django.contrib.auth.models import User
@@ -48,3 +48,4 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     # Replace ImageField with CloudinaryField
     profile_picture = CloudinaryField('image', folder='blitz-profile-pics', blank=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)  # 🆕 Add this line
