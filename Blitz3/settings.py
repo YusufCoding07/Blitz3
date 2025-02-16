@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary',
+    'cloudinary_storage',  # For media file storage
+    'django.contrib.staticfiles',
     'main.apps.MainConfig',  # Use this instead of just 'main'
 ]
 
@@ -135,7 +138,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # media configuration
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 #authentication middleware
 AUTHENTICATION_BACKENDS = [
@@ -145,3 +148,11 @@ AUTHENTICATION_BACKENDS = [
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'find_ride'
 LOGOUT_REDIRECT_URL = 'home'
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'

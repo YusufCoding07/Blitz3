@@ -16,3 +16,17 @@ class CustomUserCreationForm(UserCreationForm):
         if commit:
             user.save()
         return user
+    
+class CustomUserCreationForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+    profile_picture = forms.ImageField(required=False)
+    phone_number = forms.CharField(max_length=20, required=False)
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password1', 'password2')
+
+class ProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['profile_picture', 'phone_number', 'is_driver']

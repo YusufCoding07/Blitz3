@@ -7,9 +7,13 @@ from django.db import models
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=20, blank=True)
-    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True)
+    profile_picture = models.ImageField(
+        upload_to='profile_pics/', 
+        blank=True,
+        default='profile_pics/default.png'
+    )
     is_driver = models.BooleanField(default=False)
-    default='profile_pics/default.png'  # Add this line
+
     def __str__(self):
         return f"{self.user.username}'s Profile"
     
@@ -37,3 +41,10 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
     
+
+from cloudinary.models import CloudinaryField
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    # Replace ImageField with CloudinaryField
+    profile_picture = CloudinaryField('image', folder='blitz-profile-pics', blank=True)

@@ -1,0 +1,84 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-body">
+            <h2 class="card-title mb-4">Update Profile</h2>
+
+            <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                {% csrf_token %}
+
+                <!-- Profile Picture Upload Section -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Profile Picture</label>
+                    <div class="d-flex align-items-start gap-4">
+                        <!-- Current Picture Preview -->
+                        <div class="position-relative">
+                            {% if form.instance.profile_picture %}
+                            <img src="{{ form.instance.profile_picture.url }}"
+                                 class="rounded-circle border border-3 border-primary"
+                                 style="width: 120px; height: 120px; object-fit: cover;"
+                                 alt="Current Profile Picture">
+                            {% else %}
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center"
+                                 style="width: 120px; height: 120px;">
+                                <i class="fas fa-user fa-2x text-muted"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- File Input with Custom Styling -->
+                        <div class="flex-grow-1">
+                            <input type="file"
+                                   name="profile_picture"
+                                   accept="image/*"
+                                   class="form-control"
+                                   id="id_profile_picture">
+                            <div class="form-text">
+                                Recommended size: 200x200 pixels (JPEG or PNG)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other Form Fields -->
+                <div class="mb-3">
+                    <label for="id_email" class="form-label">Email</label>
+                    <input type="email"
+                           name="email"
+                           value="{{ form.email.value|default:'' }}"
+                           class="form-control"
+                           id="id_email">
+                </div>
+
+                <div class="mb-4">
+                    <label for="id_phone_number" class="form-label">Phone Number</label>
+                    <input type="tel"
+                           name="phone_number"
+                           value="{{ form.phone_number.value|default:'' }}"
+                           class="form-control"
+                           id="id_phone_number">
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{% url 'profile' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+</style>
+{% endblock %}

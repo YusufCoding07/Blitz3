@@ -28,15 +28,24 @@ def transactions(request):
 
 def signup(request):
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)  # Use custom form
+        form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
-            Profile.objects.get_or_create(user=user)  # Create profile
+            user.email = form.cleaned_data['email']
+            user.save()
+            
+            # Create profile
+            profile = Profile.objects.get_or_create(user=user)[0]
+            profile.profile_picture = form.cleaned_data['profile_picture']
+            profile.phone_number = form.cleaned_data['phone_number']
+            profile.save()
+            
             login(request, user)
             return redirect('home')
-        else:
-            return render(request, 'registration/signup.html', {'form': form})
-    return render(request, 'registration/signup.html', {'form': CustomUserCreationForm()})
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'registration/signup.html', {'form': form})
+
 # Login Page
 def login_view(request):
     if request.method == 'POST':
@@ -55,3 +64,14 @@ def logout_view(request):
 
 def find_ride(request):
     return render(request, 'main/find_ride.html')
+
+@login_required
+def update_profile(request):
+    if request.method == 'POST':
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
+    else:
+        form = ProfileUpdateForm(instance=request.user.profile)
+    return render(request, 'main/update_profile.html', {'form': form})
