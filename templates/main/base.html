@@ -11,40 +11,53 @@
         .hero-section {
             background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('{% static "images/city-bg.jpg" %}');
             background-size: cover;
+            background-position: center;
             color: white;
             padding: 100px 0;
         }
 
         .ride-card {
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
             cursor: pointer;
+            border: none;
         }
 
             .ride-card:hover {
                 transform: translateY(-5px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             }
 
-        .navbar-brand i {
-            margin-right: 8px;
+        /* Improved form styling */
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
         }
 
-        .card {
-            border-radius: 15px;
+        .invalid-feedback {
+            display: block;
         }
 
+        /* Better button styling */
         .btn-primary {
-            background-color: #0d6efd;
-            border: none;
-            padding: 12px;
+            padding: 0.75rem 1.5rem;
             font-weight: 500;
+            transition: all 0.2s;
         }
 
-            .btn-primary:hover {
-                background-color: #0b5ed7;
-            }
+        /* Footer styling */
+        footer {
+            margin-top: auto;
+            padding-top: 3rem;
+        }
+
+        /* Content wrapper */
+        .content-wrapper {
+            min-height: calc(100vh - 120px);
+        }
     </style>
+    {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="d-flex flex-column">
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
@@ -73,7 +86,6 @@
                         </a>
                     </li>
                     {% else %}
-                    <!-- Add these missing links -->
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'login' %}">
                             <i class="fa-solid fa-right-to-bracket"></i> Login
@@ -90,7 +102,9 @@
         </div>
     </nav>
 
-    {% block content %}{% endblock %}
+    <main class="content-wrapper">
+        {% block content %}{% endblock %}
+    </main>
 
     <!-- Footer -->
     <footer class="bg-dark text-white mt-5">
@@ -115,10 +129,14 @@
                     </ul>
                 </div>
             </div>
+            <div class="text-center mt-4">
+                <small>&copy; 2024 Blitz. All rights reserved.</small>
+            </div>
         </div>
     </footer>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>
