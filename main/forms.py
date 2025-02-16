@@ -1,7 +1,8 @@
-# main/forms.py
+﻿# main/forms.py
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from .models import UserProfile  # Add this import
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -28,5 +29,5 @@ class CustomUserCreationForm(UserCreationForm):
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
-        model = Profile
-        fields = ['profile_picture', 'phone_number', 'is_driver']
+        model = UserProfile  # ✅ Changed from Profile to UserProfile
+        fields = ['profile_picture', 'phone_number']  # Update fields as needed
