@@ -3,6 +3,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from .models import Transaction  # Import your models if needed
+from .models import Profile  # Add this line
+from .forms import CustomUserCreationForm  # Add this line
 
 # Home Page (Find Ride)
 def home(request):
@@ -23,18 +25,18 @@ def transactions(request):
     transactions = []  # Use an empty list for now
     return render(request, 'main/transactions.html', {'transactions': transactions})
 
-# Signup Page
+
 def signup(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)  # Use custom form
         if form.is_valid():
             user = form.save()
-            login(request, user)  # Auto-login after registration
+            Profile.objects.get_or_create(user=user)  # Create profile
+            login(request, user)
             return redirect('home')
-    else:
-        form = UserCreationForm()
-    return render(request, 'registration/signup.html', {'form': form})
-
+        else:
+            return render(request, 'registration/signup.html', {'form': form})
+    return render(request, 'registration/signup.html', {'form': CustomUserCreationForm()})
 # Login Page
 def login_view(request):
     if request.method == 'POST':
@@ -50,3 +52,6 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('home')
+
+def find_ride(request):
+    return render(request, 'main/find_ride.html')

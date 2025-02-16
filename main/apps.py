@@ -1,8 +1,7 @@
-from django.apps import AppConfig
+﻿from django.apps import AppConfig
 
 class MainConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'main'
-
+    # ... other config ...
     def ready(self):
-        import main.signals  # Import the signals
+        import main.signals  # Ensure this line exists
+        print("🔌 Signals registered!")  # Debug log
