@@ -13,8 +13,8 @@ def home(request):
 # Profile Page
 @login_required
 def profile(request):
-    user_profile, created = Profile.objects.get_or_create(user=request.user)
-    return render(request, 'main/profile.html', {'profile': user_profile})
+    profile, created = Profile.objects.get_or_create(user=request.user)
+    return render(request, 'main/profile.html', {'profile': profile})
 
 # Map Page
 def map_view(request):
