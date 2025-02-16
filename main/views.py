@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Transaction  # Import your models if needed
 from .models import Profile  # Add this line
 from .forms import CustomUserCreationForm  # Add this line
+from .forms import ProfileUpdateForm  # Add this line
 
 # Home Page (Find Ride)
 def home(request):
@@ -68,10 +69,11 @@ def find_ride(request):
 @login_required
 def update_profile(request):
     if request.method == 'POST':
-        form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.userprofile)
         if form.is_valid():
             form.save()
             return redirect('profile')
     else:
-        form = ProfileUpdateForm(instance=request.user.profile)
+        form = ProfileUpdateForm(instance=request.user.userprofile)
+    
     return render(request, 'main/update_profile.html', {'form': form})
