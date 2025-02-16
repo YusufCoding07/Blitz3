@@ -66,14 +66,21 @@ def logout_view(request):
 def find_ride(request):
     return render(request, 'main/find_ride.html')
 
+from django.core.exceptions import ObjectDoesNotExist
+
 @login_required
 def update_profile(request):
+    try:
+        profile = request.user.userprofile
+    except ObjectDoesNotExist:
+        profile = UserProfile.objects.create(user=request.user)
+    
     if request.method == 'POST':
-        form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.userprofile)
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             form.save()
             return redirect('profile')
     else:
-        form = ProfileUpdateForm(instance=request.user.userprofile)
+        form = ProfileUpdateForm(instance=profile)
     
     return render(request, 'main/update_profile.html', {'form': form})
