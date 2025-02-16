@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'cloudinary',
     'cloudinary_storage',  # For media file storage
-    'django.contrib.staticfiles',
     'main.apps.MainConfig',  # Use this instead of just 'main'
 ]
 
