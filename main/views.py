@@ -29,22 +29,13 @@ def transactions(request):
 
 def signup(request):
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST, request.FILES)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            user.email = form.cleaned_data['email']
-            user.save()
-            
-            # Create profile
-            profile = Profile.objects.get_or_create(user=user)[0]
-            profile.profile_picture = form.cleaned_data['profile_picture']
-            profile.phone_number = form.cleaned_data['phone_number']
-            profile.save()
-            
-            login(request, user)
-            return redirect('home')
+            form.save()
+            return redirect('login')
     else:
         form = CustomUserCreationForm()
+    
     return render(request, 'registration/signup.html', {'form': form})
 
 # Login Page
