@@ -44,7 +44,10 @@ def save_user_profile(sender, instance, **kwargs):
 
 from cloudinary.models import CloudinaryField
 
-# class UserProfile(models.Model):
-#     user = models.OneToOneField(User, on_delete=models.CASCADE)
-#     profile_picture = CloudinaryField('image', folder='blitz-profile-pics', blank=True)
-#     phone_number = models.CharField(max_length=20, blank=True, null=True)
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    profile_picture = CloudinaryField('image', blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
+
+    def __str__(self):
+        return f'{self.user.username} Profile'
