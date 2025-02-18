@@ -24,6 +24,9 @@ class Transaction(models.Model):
     description = models.CharField(max_length=255)
     date = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        db_table = 'main_transaction'
+
     def __str__(self):
         return f"Transaction {self.id} by {self.user.username}"
 
