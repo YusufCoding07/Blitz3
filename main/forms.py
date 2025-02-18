@@ -6,6 +6,8 @@ from .models import UserProfile  # Add this import
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)
+    profile_picture = forms.ImageField(required=False)
+    phone_number = forms.CharField(max_length=20, required=False)
     
     class Meta:
         model = User
@@ -17,16 +19,8 @@ class CustomUserCreationForm(UserCreationForm):
         self.fields['email'].widget.attrs.update({'class': 'form-control'})
         self.fields['password1'].widget.attrs.update({'class': 'form-control'})
         self.fields['password2'].widget.attrs.update({'class': 'form-control'})
-        
-
-class CustomUserCreationForm(UserCreationForm):
-    email = forms.EmailField(required=True)
-    profile_picture = forms.ImageField(required=False)
-    phone_number = forms.CharField(max_length=20, required=False)
-
-    class Meta:
-        model = User
-        fields = ('username', 'email', 'password1', 'password2')
+        self.fields['profile_picture'].widget.attrs.update({'class': 'form-control'})
+        self.fields['phone_number'].widget.attrs.update({'class': 'form-control'})
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
