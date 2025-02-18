@@ -26,3 +26,18 @@ class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = UserProfile  # ✅ Changed from Profile to UserProfile
         fields = ['profile_picture', 'phone_number']  # Update fields as needed
+
+class DriverApplicationForm(forms.ModelForm):
+    has_valid_license = forms.BooleanField(
+        required=True,
+        label='I confirm I have a valid driving license'
+    )
+    car_model = forms.CharField(
+        max_length=100,
+        required=True,
+        label='Car Model (e.g., Toyota Camry 2020)'
+    )
+
+    class Meta:
+        model = UserProfile
+        fields = ['has_valid_license', 'car_model']

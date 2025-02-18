@@ -12,4 +12,5 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('find-ride/', views.find_ride, name='find_ride'),
     path('profile/update/', views.update_profile, name='update_profile'),
+    path('driver-application/', views.driver_application, name='driver_application'),
 ]

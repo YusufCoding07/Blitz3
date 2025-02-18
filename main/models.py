@@ -8,6 +8,9 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profile_picture = CloudinaryField('image', blank=True, null=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
+    is_driver = models.BooleanField(default=False)
+    has_valid_license = models.BooleanField(default=False)
+    car_model = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return f'{self.user.username} Profile'
