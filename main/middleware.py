@@ -8,7 +8,7 @@ class DatabaseCheckMiddleware:
     def __call__(self, request):
         try:
             with connection.cursor() as cursor:
-                cursor.execute("SELECT 1 FROM main_userprofile LIMIT 1")
+                cursor.execute("SELECT 1 FROM main_profile LIMIT 1")
             return self.get_response(request)
         except Exception as e:
             return HttpResponse(f"Database error: {str(e)}", status=500)

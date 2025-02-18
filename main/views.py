@@ -31,8 +31,10 @@ def signup(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('login')
+            user = form.save()
+            # Profile creation should happen automatically via signals
+            login(request, user)  # Automatically log in the user
+            return redirect('profile')  # Redirect to profile page instead of login
     else:
         form = CustomUserCreationForm()
     
@@ -62,9 +64,9 @@ from django.core.exceptions import ObjectDoesNotExist
 @login_required
 def update_profile(request):
     try:
-        profile = request.user.userprofile
+        profile = Profile.objects.get(user=request.user)
     except ObjectDoesNotExist:
-        profile = UserProfile.objects.create(user=request.user)
+        profile = Profile.objects.create(user=request.user)
     
     if request.method == 'POST':
         form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
