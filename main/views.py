@@ -9,6 +9,7 @@ from .models import Transaction  # Import your models if needed
 from .models import UserProfile  # Updated this line
 from .forms import CustomUserCreationForm  # Add this line
 from .forms import ProfileUpdateForm  # Add this line
+from .forms import UserProfileForm, DriverApplicationForm
 
 # Home Page (Find Ride)
 def home(request):
@@ -18,7 +19,11 @@ def home(request):
 @login_required
 def profile(request):
     profile, created = UserProfile.objects.get_or_create(user=request.user)
-    return render(request, 'main/profile.html', {'profile': profile})
+    driver_form = DriverApplicationForm()
+    return render(request, 'main/profile.html', {
+        'profile': profile,
+        'driver_form': driver_form
+    })
 
 # Map Page
 def map_view(request):
@@ -80,3 +85,15 @@ def update_profile(request):
         form = ProfileUpdateForm(instance=profile)
     
     return render(request, 'main/update_profile.html', {'form': form})
+
+@login_required
+def driver_application(request):
+    if request.method == 'POST':
+        form = DriverApplicationForm(request.POST, instance=request.user.userprofile)
+        if form.is_valid():
+            profile = form.save(commit=False)
+            profile.is_driver = True
+            profile.save()
+            messages.success(request, 'Your driver application has been approved!')
+            return redirect('profile')
+    return redirect('profile')
