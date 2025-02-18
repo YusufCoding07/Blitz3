@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'cloudinary',
     'cloudinary_storage',  # For media file storage
     'main.apps.MainConfig',  # Use this instead of just 'main'
+    'crispy_forms',
+    'crispy_bootstrap4',
 ]
 
 MIDDLEWARE = [
@@ -157,3 +159,5 @@ CLOUDINARY_STORAGE = {
 }
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
