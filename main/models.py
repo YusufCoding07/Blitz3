@@ -12,6 +12,9 @@ class UserProfile(models.Model):
     has_valid_license = models.BooleanField(default=False)
     car_model = models.CharField(max_length=100, blank=True, null=True)
 
+    class Meta:
+        db_table = 'main_userprofile'
+
     def __str__(self):
         return f'{self.user.username} Profile'
 
