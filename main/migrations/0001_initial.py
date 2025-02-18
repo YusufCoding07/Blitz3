@@ -12,6 +12,15 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunSQL(
+            # Drop tables if they exist
+            """
+            DROP TABLE IF EXISTS main_profile CASCADE;
+            DROP TABLE IF EXISTS main_userprofile CASCADE;
+            DROP TABLE IF EXISTS main_transaction CASCADE;
+            """,
+            reverse_sql=migrations.RunSQL.noop
+        ),
         migrations.CreateModel(
             name='UserProfile',
             fields=[

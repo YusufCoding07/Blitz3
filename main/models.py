@@ -5,7 +5,11 @@ from django.dispatch import receiver
 from cloudinary.models import CloudinaryField
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userprofile')
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='userprofile'
+    )
     profile_picture = CloudinaryField('image', blank=True, null=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     is_driver = models.BooleanField(default=False)
@@ -14,6 +18,8 @@ class UserProfile(models.Model):
 
     class Meta:
         db_table = 'main_userprofile'
+        app_label = 'main'
+        managed = True
 
     def __str__(self):
         return f'{self.user.username} Profile'
@@ -26,6 +32,8 @@ class Transaction(models.Model):
 
     class Meta:
         db_table = 'main_transaction'
+        app_label = 'main'
+        managed = True
 
     def __str__(self):
         return f"Transaction {self.id} by {self.user.username}"
