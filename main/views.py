@@ -8,7 +8,6 @@ from django.contrib import messages
 from .models import Transaction  # Import your models if needed
 from .models import UserProfile  # Updated this line
 from .forms import CustomUserCreationForm  # Add this line
-from .forms import ProfileUpdateForm  # Add this line
 from .forms import UserProfileForm, DriverApplicationForm
 
 # Home Page (Find Ride)
@@ -31,8 +30,8 @@ def map_view(request):
 
 # Transactions Page
 def transactions(request):
-    transactions = []  # Use an empty list for now
-    return render(request, 'main/transactions.html', {'transactions': transactions})
+    user_transactions = Transaction.objects.filter(user=request.user)
+    return render(request, 'main/transactions.html', {'transactions': user_transactions})
 
 
 def signup(request):
@@ -40,9 +39,8 @@ def signup(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # Profile creation should happen automatically via signals
-            login(request, user)  # Automatically log in the user
-            return redirect('profile')  # Redirect to profile page instead of login
+            messages.success(request, 'Account created successfully!')
+            return redirect('login')
     else:
         form = CustomUserCreationForm()
     
@@ -71,18 +69,14 @@ from django.core.exceptions import ObjectDoesNotExist
 
 @login_required
 def update_profile(request):
-    try:
-        profile = UserProfile.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        profile = UserProfile.objects.create(user=request.user)
-    
     if request.method == 'POST':
-        form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
+        form = UserProfileForm(request.POST, request.FILES, instance=request.user.userprofile)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Your profile has been updated!')
             return redirect('profile')
     else:
-        form = ProfileUpdateForm(instance=profile)
+        form = UserProfileForm(instance=request.user.userprofile)
     
     return render(request, 'main/update_profile.html', {'form': form})
 
