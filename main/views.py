@@ -17,12 +17,15 @@ def home(request):
 # Profile Page
 @login_required
 def profile(request):
-    profile, created = UserProfile.objects.get_or_create(user=request.user)
-    driver_form = DriverApplicationForm()
-    return render(request, 'main/profile.html', {
+    # Get or create the user profile
+    profile = UserProfile.objects.get_or_create(user=request.user)[0]
+    driver_form = DriverApplicationForm(instance=profile)
+    
+    context = {
         'profile': profile,
-        'driver_form': driver_form
-    })
+        'driver_form': driver_form,
+    }
+    return render(request, 'main/profile.html', context)
 
 # Map Page
 def map_view(request):
