@@ -2,8 +2,11 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.shortcuts import render, redirect
+from django.contrib import messages
 from .models import Transaction  # Import your models if needed
-from .models import Profile  # Add this line
+from .models import UserProfile  # Updated this line
 from .forms import CustomUserCreationForm  # Add this line
 from .forms import ProfileUpdateForm  # Add this line
 
@@ -14,7 +17,7 @@ def home(request):
 # Profile Page
 @login_required
 def profile(request):
-    profile, created = Profile.objects.get_or_create(user=request.user)
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
     return render(request, 'main/profile.html', {'profile': profile})
 
 # Map Page
@@ -64,9 +67,9 @@ from django.core.exceptions import ObjectDoesNotExist
 @login_required
 def update_profile(request):
     try:
-        profile = Profile.objects.get(user=request.user)
+        profile = UserProfile.objects.get(user=request.user)
     except ObjectDoesNotExist:
-        profile = Profile.objects.create(user=request.user)
+        profile = UserProfile.objects.create(user=request.user)
     
     if request.method == 'POST':
         form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
