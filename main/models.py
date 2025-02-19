@@ -6,10 +6,10 @@ from cloudinary.models import CloudinaryField
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone_number = models.CharField(max_length=15, blank=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
     is_driver = models.BooleanField(default=False)
     has_valid_license = models.BooleanField(default=False)
-    car_model = models.CharField(max_length=100, blank=True)
+    car_model = models.CharField(max_length=100, blank=True, null=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
     def __str__(self):
