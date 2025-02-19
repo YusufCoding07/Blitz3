@@ -6,8 +6,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Transaction, UserProfile
-from .forms import CustomUserCreationForm  # Add this line
-from .forms import UserProfileForm, DriverApplicationForm
+from .forms import CustomUserCreationForm, UserProfileForm, DriverApplicationForm, UserRegistrationForm
 import logging
 import traceback
 
@@ -81,18 +80,19 @@ def transactions(request):
     transactions = Transaction.objects.filter(user=request.user).order_by('-date')
     return render(request, 'main/transactions.html', {'transactions': transactions})
 
-
-def signup(request):
+def register(request):
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
+        form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            messages.success(request, 'Account created successfully!')
+            # Create UserProfile for the new user
+            UserProfile.objects.create(user=user)  # Use UserProfile instead of Profile
+            username = form.cleaned_data.get('username')
+            messages.success(request, f'Account created for {username}!')
             return redirect('login')
     else:
-        form = CustomUserCreationForm()
-    
-    return render(request, 'registration/signup.html', {'form': form})
+        form = UserRegistrationForm()
+    return render(request, 'main/register.html', {'form': form})
 
 # Login Page
 def login_view(request):
