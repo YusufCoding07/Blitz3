@@ -9,6 +9,7 @@ from .models import Transaction, UserProfile
 from .forms import CustomUserCreationForm  # Add this line
 from .forms import UserProfileForm, DriverApplicationForm
 import logging
+import traceback
 
 logger = logging.getLogger('django')
 
@@ -17,21 +18,28 @@ def home(request):
     try:
         context = {}
         if request.user.is_authenticated:
+            logger.info(f"Authenticated user: {request.user.username}")
             try:
-                profile, created = UserProfile.objects.get_or_create(user=request.user)
+                profile = UserProfile.objects.get(user=request.user)
+                logger.info(f"Found profile for user: {profile}")
+                context['profile'] = profile
+            except UserProfile.DoesNotExist:
+                logger.error(f"No profile found for user {request.user.username}")
+                profile = UserProfile.objects.create(user=request.user)
                 context['profile'] = profile
             except Exception as e:
-                logger.error(f"Error getting profile: {str(e)}")
+                logger.error(f"Error getting profile: {str(e)}\n{traceback.format_exc()}")
                 
             try:
                 transactions = Transaction.objects.filter(user=request.user).order_by('-date')[:5]
+                logger.info(f"Found {len(transactions)} transactions")
                 context['transactions'] = transactions
             except Exception as e:
-                logger.error(f"Error getting transactions: {str(e)}")
+                logger.error(f"Error getting transactions: {str(e)}\n{traceback.format_exc()}")
                 
         return render(request, 'main/home.html', context)
     except Exception as e:
-        logger.error(f"Error in home view: {str(e)}")
+        logger.error(f"Error in home view: {str(e)}\n{traceback.format_exc()}")
         return render(request, 'main/error.html', {'error': str(e)})
 
 # Profile Page

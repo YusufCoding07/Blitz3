@@ -12,6 +12,9 @@ class UserProfile(models.Model):
     car_model = models.CharField(max_length=100, blank=True, null=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
+    class Meta:
+        db_table = 'main_userprofile'
+
     def __str__(self):
         return f'{self.user.username} Profile'
 
@@ -22,10 +25,8 @@ class Transaction(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = 'Transaction'
-        verbose_name_plural = 'Transactions'
-        ordering = ['-date']
         db_table = 'main_transaction'
+        ordering = ['-date']
 
     def __str__(self):
         return f'{self.user.username} - {self.amount} - {self.description}'
