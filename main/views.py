@@ -5,36 +5,64 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import Transaction  # Import your models if needed
-from .models import UserProfile  # Make sure it's UserProfile, not Profile
+from .models import Transaction, UserProfile
 from .forms import CustomUserCreationForm  # Add this line
 from .forms import UserProfileForm, DriverApplicationForm
 
 # Home Page (Find Ride)
 def home(request):
-    return render(request, 'main/home.html')
+    try:
+        if request.user.is_authenticated:
+            context = {}
+            try:
+                profile = request.user.userprofile
+                context['profile'] = profile
+            except UserProfile.DoesNotExist:
+                pass
+            
+            try:
+                transactions = Transaction.objects.filter(user=request.user).order_by('-date')[:5]
+                context['transactions'] = transactions
+            except Transaction.DoesNotExist:
+                pass
+            
+            return render(request, 'main/home.html', context)
+        return render(request, 'main/home.html')
+    except Exception as e:
+        print(f"Error in home view: {str(e)}")
+        return render(request, 'main/error.html', {'error': str(e)})
 
 # Profile Page
 @login_required
 def profile(request):
-    # Get or create the user profile
-    profile = UserProfile.objects.get_or_create(user=request.user)[0]
-    driver_form = DriverApplicationForm(instance=profile)
+    try:
+        profile = request.user.userprofile
+    except UserProfile.DoesNotExist:
+        profile = UserProfile.objects.create(user=request.user)
     
-    context = {
-        'profile': profile,
-        'driver_form': driver_form,
-    }
-    return render(request, 'main/profile.html', context)
+    if request.method == 'POST':
+        # Handle profile update
+        profile.phone_number = request.POST.get('phone_number', '')
+        profile.is_driver = request.POST.get('is_driver', False) == 'on'
+        profile.has_valid_license = request.POST.get('has_valid_license', False) == 'on'
+        profile.car_model = request.POST.get('car_model', '')
+        if 'profile_picture' in request.FILES:
+            profile.profile_picture = request.FILES['profile_picture']
+        profile.save()
+        messages.success(request, 'Your profile has been updated!')
+        return redirect('profile')
+    
+    return render(request, 'main/profile.html', {'profile': profile})
 
 # Map Page
 def map_view(request):
     return render(request, 'main/map.html')
 
 # Transactions Page
+@login_required
 def transactions(request):
-    user_transactions = Transaction.objects.filter(user=request.user)
-    return render(request, 'main/transactions.html', {'transactions': user_transactions})
+    transactions = Transaction.objects.filter(user=request.user).order_by('-date')
+    return render(request, 'main/transactions.html', {'transactions': transactions})
 
 
 def signup(request):

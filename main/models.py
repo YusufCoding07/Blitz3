@@ -5,21 +5,17 @@ from django.dispatch import receiver
 from cloudinary.models import CloudinaryField
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-        related_name='userprofile'
-    )
-    profile_picture = CloudinaryField('image', blank=True, null=True)
-    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
     is_driver = models.BooleanField(default=False)
     has_valid_license = models.BooleanField(default=False)
     car_model = models.CharField(max_length=100, blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
     class Meta:
+        verbose_name = 'User Profile'
+        verbose_name_plural = 'User Profiles'
         db_table = 'main_userprofile'
-        app_label = 'main'
-        managed = True
 
     def __str__(self):
         return f'{self.user.username} Profile'
@@ -27,16 +23,17 @@ class UserProfile(models.Model):
 class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    description = models.CharField(max_length=255)
+    description = models.CharField(max_length=200)
     date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        verbose_name = 'Transaction'
+        verbose_name_plural = 'Transactions'
+        ordering = ['-date']
         db_table = 'main_transaction'
-        app_label = 'main'
-        managed = True
 
     def __str__(self):
-        return f"Transaction {self.id} by {self.user.username}"
+        return f'{self.user.username} - {self.amount} - {self.description}'
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
