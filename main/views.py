@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Transaction  # Import your models if needed
-from .models import UserProfile  # Updated this line
+from .models import UserProfile  # Make sure it's UserProfile, not Profile
 from .forms import CustomUserCreationForm  # Add this line
 from .forms import UserProfileForm, DriverApplicationForm
 
