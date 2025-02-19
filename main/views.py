@@ -139,3 +139,10 @@ def driver_application(request):
             messages.success(request, 'Your driver application has been approved!')
             return redirect('profile')
     return redirect('profile')
+
+@login_required
+def request_ride(request):
+    if request.method == 'POST':
+        # Add your ride request logic here
+        return redirect('find_ride')
+    return render(request, 'main/find_ride.html')
