@@ -55,9 +55,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'main.middleware.DatabaseCheckMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -71,10 +70,9 @@ ROOT_URLCONF = 'Blitz3.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # For custom templates
-        'APP_DIRS': True,  # REQUIRED FOR ADMIN TEMPLATES
+        'DIRS': [],
+        'APP_DIRS': True,
         'OPTIONS': {
-            'debug': True,  # Add temporarily
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
