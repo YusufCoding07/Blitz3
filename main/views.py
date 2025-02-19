@@ -146,3 +146,36 @@ def request_ride(request):
         # Add your ride request logic here
         return redirect('find_ride')
     return render(request, 'main/find_ride.html')
+
+@login_required
+def accept_ride(request, transaction_id):
+    try:
+        transaction = Transaction.objects.get(id=transaction_id)
+        # Add your ride acceptance logic here
+        messages.success(request, 'Ride accepted successfully!')
+        return redirect('home')
+    except Transaction.DoesNotExist:
+        messages.error(request, 'Ride not found.')
+        return redirect('home')
+
+@login_required
+def complete_ride(request, transaction_id):
+    try:
+        transaction = Transaction.objects.get(id=transaction_id)
+        # Add your ride completion logic here
+        messages.success(request, 'Ride completed successfully!')
+        return redirect('home')
+    except Transaction.DoesNotExist:
+        messages.error(request, 'Ride not found.')
+        return redirect('home')
+
+@login_required
+def cancel_ride(request, transaction_id):
+    try:
+        transaction = Transaction.objects.get(id=transaction_id)
+        # Add your ride cancellation logic here
+        messages.success(request, 'Ride cancelled successfully!')
+        return redirect('home')
+    except Transaction.DoesNotExist:
+        messages.error(request, 'Ride not found.')
+        return redirect('home')
