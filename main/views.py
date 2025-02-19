@@ -20,22 +20,29 @@ def home(request):
         if request.user.is_authenticated:
             logger.info(f"Authenticated user: {request.user.username}")
             try:
-                profile = UserProfile.objects.get(user=request.user)
-                logger.info(f"Found profile for user: {profile}")
-                context['profile'] = profile
-            except UserProfile.DoesNotExist:
-                logger.error(f"No profile found for user {request.user.username}")
-                profile = UserProfile.objects.create(user=request.user)
+                # Change from UserProfile.objects.get() to a more defensive approach
+                profile, created = UserProfile.objects.get_or_create(
+                    user=request.user,
+                    defaults={
+                        'phone_number': '',
+                        'is_driver': False,
+                        'has_valid_license': False,
+                        'car_model': ''
+                    }
+                )
+                logger.info(f"Profile {'created' if created else 'found'} for user: {profile}")
                 context['profile'] = profile
             except Exception as e:
-                logger.error(f"Error getting profile: {str(e)}\n{traceback.format_exc()}")
-                
+                logger.error(f"Error with profile: {str(e)}\n{traceback.format_exc()}")
+                context['profile_error'] = str(e)
+            
             try:
                 transactions = Transaction.objects.filter(user=request.user).order_by('-date')[:5]
                 logger.info(f"Found {len(transactions)} transactions")
                 context['transactions'] = transactions
             except Exception as e:
                 logger.error(f"Error getting transactions: {str(e)}\n{traceback.format_exc()}")
+                context['transaction_error'] = str(e)
                 
         return render(request, 'main/home.html', context)
     except Exception as e:

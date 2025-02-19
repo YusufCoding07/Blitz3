@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    {% if profile_error %}
+        <div class="alert alert-warning">
+            Error loading profile: {{ profile_error }}
+        </div>
+    {% endif %}
+    
+    {% if transaction_error %}
+        <div class="alert alert-warning">
+            Error loading transactions: {{ transaction_error }}
+        </div>
+    {% endif %}
+
+    {% if profile %}
+        <!-- Your existing profile display code -->
+    {% endif %}
+
+    {% if transactions %}
+        <!-- Your existing transactions display code -->
+    {% endif %}
+</div>
+{% endblock %} 
