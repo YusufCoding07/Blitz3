@@ -86,9 +86,9 @@ def register(request):
         if form.is_valid():
             user = form.save()
             # Create UserProfile for the new user
-            UserProfile.objects.create(user=user)  # Use UserProfile instead of Profile
-            username = form.cleaned_data.get('username')
-            messages.success(request, f'Account created for {username}!')
+            UserProfile.objects.create(user=user)
+            login(request, user)
+            messages.success(request, 'Registration successful!')
             return redirect('login')
     else:
         form = UserRegistrationForm()

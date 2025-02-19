@@ -4,29 +4,24 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import UserProfile
 
-class CustomUserCreationForm(UserCreationForm):
-    email = forms.EmailField(required=True)
+class UserRegistrationForm(UserCreationForm):
+    email = forms.EmailField()
 
     class Meta:
         model = User
-        fields = ("username", "email", "password1", "password2")
+        fields = ['username', 'email', 'password1', 'password2']
 
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['profile_picture', 'phone_number']
 
-class DriverApplicationForm(forms.ModelForm):
-    has_valid_license = forms.BooleanField(
-        required=True,
-        label='I confirm I have a valid driving license'
-    )
-    car_model = forms.CharField(
-        max_length=100,
-        required=True,
-        label='Car Model (e.g., Toyota Camry 2020)'
-    )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = False
 
+class DriverApplicationForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['has_valid_license', 'car_model']
+        fields = ['phone_number', 'car_model', 'has_valid_license']
