@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'wehs2te9fm=emla_ee*yb!_6%m3t8(^_i1vv^=x0+i##+yoi*t')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  # Ensure this is set
+DEBUG = True  # Temporarily set to True to see error details
 
 ALLOWED_HOSTS = [
     'blitz-jt0s.onrender.com',
@@ -47,17 +47,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cloudinary',
-    'cloudinary_storage',  # For media file storage
-    'main.apps.MainConfig',  # Use this instead of just 'main'
+    'main.apps.MainConfig',  # Make sure this is correct
     'crispy_forms',
     'crispy_bootstrap4',
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 MIDDLEWARE = [
-    'main.middleware.DatabaseCheckMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -71,10 +70,9 @@ ROOT_URLCONF = 'Blitz3.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # For custom templates
-        'APP_DIRS': True,  # REQUIRED FOR ADMIN TEMPLATES
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'APP_DIRS': True,
         'OPTIONS': {
-            'debug': True,  # Add temporarily
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -174,3 +172,46 @@ CLOUDINARY_STORAGE = {
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# Make sure you have this for user profile
+AUTH_PROFILE_MODULE = 'main.UserProfile'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}
+
+# Also add this at the bottom of settings.py
+DEBUG = True  # Temporarily enable debug for more detailed error messages

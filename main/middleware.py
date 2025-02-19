@@ -6,9 +6,15 @@ class DatabaseCheckMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        # Check if the database is available
         try:
             with connection.cursor() as cursor:
-                cursor.execute("SELECT 1 FROM main_profile LIMIT 1")
-            return self.get_response(request)
+                # Update this to use the correct table name
+                cursor.execute("SELECT 1 FROM main_userprofile LIMIT 1")
         except Exception as e:
-            return HttpResponse(f"Database error: {str(e)}", status=500)
+            # Handle the error appropriately
+            print(f"Database error: {e}")
+            # You might want to return an error response here
+            
+        response = self.get_response(request)
+        return response
