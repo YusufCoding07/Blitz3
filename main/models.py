@@ -6,30 +6,23 @@ from cloudinary.models import CloudinaryField
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    phone_number = models.CharField(max_length=15, blank=True)
     is_driver = models.BooleanField(default=False)
     has_valid_license = models.BooleanField(default=False)
-    car_model = models.CharField(max_length=100, blank=True, null=True)
+    car_model = models.CharField(max_length=100, blank=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
-    class Meta:
-        db_table = 'main_userprofile'
-
     def __str__(self):
-        return f'{self.user.username} Profile'
+        return self.user.username
 
 class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    description = models.CharField(max_length=200)
     date = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        db_table = 'main_transaction'
-        ordering = ['-date']
+    description = models.CharField(max_length=200)
 
     def __str__(self):
-        return f'{self.user.username} - {self.amount} - {self.description}'
+        return f"{self.user.username} - {self.amount} - {self.date}"
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
