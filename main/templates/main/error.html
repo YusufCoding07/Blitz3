@@ -1,8 +1,12 @@
-{% extends "main/base.html" %}
+{% extends 'base.html' %}
+
 {% block content %}
-<div class="alert alert-danger">
-    <h4>An error occurred</h4>
-    <p>{{ error }}</p>
-    <a href="{% url 'home' %}" class="btn btn-primary">Return to Home</a>
+<div class="container mt-5">
+    <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">Error!</h4>
+        <p>{{ error }}</p>
+        <hr>
+        <p class="mb-0">Please try again later or contact support if the problem persists.</p>
+    </div>
 </div>
-{% endblock content %}
+{% endblock %}

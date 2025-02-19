@@ -8,28 +8,30 @@ from django.contrib import messages
 from .models import Transaction, UserProfile
 from .forms import CustomUserCreationForm  # Add this line
 from .forms import UserProfileForm, DriverApplicationForm
+import logging
+
+logger = logging.getLogger('django')
 
 # Home Page (Find Ride)
 def home(request):
     try:
+        context = {}
         if request.user.is_authenticated:
-            context = {}
             try:
-                profile = request.user.userprofile
+                profile, created = UserProfile.objects.get_or_create(user=request.user)
                 context['profile'] = profile
-            except UserProfile.DoesNotExist:
-                pass
-            
+            except Exception as e:
+                logger.error(f"Error getting profile: {str(e)}")
+                
             try:
                 transactions = Transaction.objects.filter(user=request.user).order_by('-date')[:5]
                 context['transactions'] = transactions
-            except Transaction.DoesNotExist:
-                pass
-            
-            return render(request, 'main/home.html', context)
-        return render(request, 'main/home.html')
+            except Exception as e:
+                logger.error(f"Error getting transactions: {str(e)}")
+                
+        return render(request, 'main/home.html', context)
     except Exception as e:
-        print(f"Error in home view: {str(e)}")
+        logger.error(f"Error in home view: {str(e)}")
         return render(request, 'main/error.html', {'error': str(e)})
 
 # Profile Page

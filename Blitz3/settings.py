@@ -177,3 +177,19 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Make sure you have this for user profile
 AUTH_PROFILE_MODULE = 'main.UserProfile'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+        },
+    },
+}
