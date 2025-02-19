@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Transaction, UserProfile
-from .forms import CustomUserCreationForm, UserProfileForm, DriverApplicationForm, UserRegistrationForm
+from .forms import UserProfileForm, DriverApplicationForm, UserRegistrationForm
 import logging
 import traceback
 
