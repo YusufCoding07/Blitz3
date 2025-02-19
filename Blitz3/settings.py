@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'wehs2te9fm=emla_ee*yb!_6%m3t8(^_i1vv^=x0+i##+yoi*t')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  # Ensure this is set
+DEBUG = True  # Temporarily set to True to see error details
 
 ALLOWED_HOSTS = [
     'blitz-jt0s.onrender.com',
