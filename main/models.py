@@ -12,11 +12,6 @@ class UserProfile(models.Model):
     car_model = models.CharField(max_length=100, blank=True, null=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
-    class Meta:
-        verbose_name = 'User Profile'
-        verbose_name_plural = 'User Profiles'
-        db_table = 'main_userprofile'
-
     def __str__(self):
         return f'{self.user.username} Profile'
 
