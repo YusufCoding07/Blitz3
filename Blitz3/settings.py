@@ -47,11 +47,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cloudinary',
-    'cloudinary_storage',  # For media file storage
-    'main.apps.MainConfig',  # Use this instead of just 'main'
+    'main.apps.MainConfig',  # Make sure this is correct
     'crispy_forms',
     'crispy_bootstrap4',
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 MIDDLEWARE = [
@@ -174,3 +174,6 @@ CLOUDINARY_STORAGE = {
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# Make sure you have this for user profile
+AUTH_PROFILE_MODULE = 'main.UserProfile'
