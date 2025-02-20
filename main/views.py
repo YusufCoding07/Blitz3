@@ -176,3 +176,6 @@ def cancel_ride(request, transaction_id):
     except Transaction.DoesNotExist:
         messages.error(request, 'Ride not found.')
         return redirect('home')
+
+def terms(request):
+    return render(request, 'main/terms.html')
