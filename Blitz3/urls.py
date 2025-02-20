@@ -19,13 +19,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main.urls')),  # Main app URLs
     path('accounts/', include('django.contrib.auth.urls')),  # Auth URLs
-    # Remove duplicate signup URL since it's in main.urls
-    # path('signup/', views.signup, name='signup'),
+    path('logout/', LogoutView.as_view(next_page='home'), name='logout'),  # Add this line
 ]
 
 # Add static and media URLs for development
