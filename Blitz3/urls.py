@@ -17,9 +17,11 @@ Including another URLconf
 # Blitz3/urls.py
 from django.contrib import admin
 from django.urls import path, include
+from main import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main.urls')),  # Your app's URLs
     path('accounts/', include('django.contrib.auth.urls')),  # Add this line
+    path('signup/', views.signup, name='signup'),
 ]

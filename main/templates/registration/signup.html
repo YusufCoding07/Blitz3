@@ -8,6 +8,23 @@
             <div class="card shadow">
                 <div class="card-body">
                     <h3 class="card-title text-center mb-4">Sign Up</h3>
+                    
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    <!-- Add form validation messages -->
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
 
                     <form method="post" class="needs-validation" novalidate>
                         {% csrf_token %}
@@ -66,6 +83,11 @@
                                 {{ error }}
                             </div>
                             {% endfor %}
+                        </div>
+
+                        <!-- Add password validation messages -->
+                        <div class="form-text text-muted">
+                            <small>Password must contain at least 8 characters</small>
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100 mb-3">Create Account</button>

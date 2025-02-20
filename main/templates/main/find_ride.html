@@ -39,6 +39,13 @@
     </div>
 </div>
 
+<!-- Add error handling for form -->
+{% if form.errors %}
+<div class="alert alert-danger">
+    Please correct the errors below.
+</div>
+{% endif %}
+
 <div class="container my-5">
     <h2 class="mb-4">Available Rides</h2>
 
@@ -83,7 +90,8 @@
                              class="rounded-circle me-3"
                              width="60"
                              height="60"
-                             alt="Driver">
+                             alt="Driver"
+                             onerror="this.src='{% static 'images/user-avatar.png' %}'">
                         <div>
                             <h5 class="mb-0">{{ ride.driver.username }}</h5>
                             <small class="text-muted">{{ ride.get_ride_type_display }}</small>

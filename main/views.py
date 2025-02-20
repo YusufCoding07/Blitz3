@@ -179,3 +179,17 @@ def cancel_ride(request, transaction_id):
     except Transaction.DoesNotExist:
         messages.error(request, 'Ride not found.')
         return redirect('home')
+
+def signup(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, 'Account created successfully!')
+            return redirect('home')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = UserCreationForm()
+    return render(request, 'registration/signup.html', {'form': form})

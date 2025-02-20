@@ -12,10 +12,11 @@
                 <div class="col-md-4 text-center">
                     <div class="position-relative">
                         {% if profile.profile_picture %}
-                        <img src="{{ profile.profile_picture.url|default:'static/images/user-avatar.png' }}"
+                        <img src="{{ profile.profile_picture.url }}"
                              class="img-fluid rounded-circle border-primary border-3"
                              style="width: 200px; height: 200px; object-fit: cover;"
-                             alt="Profile Picture">
+                             alt="Profile Picture"
+                             onerror="this.src='{% static 'images/user-avatar.png' %}'">
                         {% else %}
                         <div class="rounded-circle bg-light d-flex align-items-center justify-content-center"
                              style="width: 200px; height: 200px; margin: 0 auto; border: 3px solid #0d6efd;">
@@ -73,6 +74,11 @@
             <form method="post" action="{% url 'driver_application' %}">
                 <div class="modal-body">
                     {% csrf_token %}
+                    {% if driver_form.errors %}
+                    <div class="alert alert-danger">
+                        Please correct the errors below.
+                    </div>
+                    {% endif %}
                     {{ driver_form|crispy }}
                 </div>
                 <div class="modal-footer">
