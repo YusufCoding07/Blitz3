@@ -9,12 +9,23 @@
                 <form class="card card-body" action="{% url 'find_ride' %}" method="POST">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <input type="text" class="form-control form-control-lg" placeholder="Enter pickup location">
+                        <input type="text" 
+                               name="pickup_location"
+                               class="form-control form-control-lg" 
+                               placeholder="Enter pickup location"
+                               required>
                     </div>
                     <div class="mb-3">
-                        <input type="text" class="form-control form-control-lg" placeholder="Enter destination">
+                        <input type="text"
+                               name="destination"
+                               class="form-control form-control-lg" 
+                               placeholder="Enter destination"
+                               required>
                     </div>
-                    <button class="btn btn-primary btn-lg w-100">Request Ride</button>
+                    <button type="submit" class="btn btn-primary btn-lg w-100" onclick="this.form.submit(); this.disabled=true;">
+                        <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                        Request Ride
+                    </button>
                 </form>
             </div>
         </div>
@@ -34,7 +45,8 @@
                              width="50"
                              height="50"
                              alt="Driver"
-                             onerror="this.src='{% static 'images/user-avatar.png' %}'">
+                             data-default-src="{% static 'images/user-avatar.png' %}"
+                             onerror="this.onerror=null; this.src=this.getAttribute('data-default-src')">
                         <div>
                             <h5 class="mb-0">{{ ride.driver.username }}</h5>
                             <small class="text-muted">4.9 ★</small>

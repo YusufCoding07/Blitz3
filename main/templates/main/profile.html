@@ -16,7 +16,8 @@
                              class="img-fluid rounded-circle border-primary border-3"
                              style="width: 200px; height: 200px; object-fit: cover;"
                              alt="Profile Picture"
-                             onerror="this.src='{% static 'images/user-avatar.png' %}'">
+                             data-default-src="{% static 'images/user-avatar.png' %}"
+                             onerror="this.onerror=null; this.src=this.getAttribute('data-default-src')">
                         {% else %}
                         <div class="rounded-circle bg-light d-flex align-items-center justify-content-center"
                              style="width: 200px; height: 200px; margin: 0 auto; border: 3px solid #0d6efd;">
@@ -71,7 +72,7 @@
                 <h5 class="modal-title" id="driverApplicationModalLabel">Driver Application</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="post" action="{% url 'driver_application' %}">
+            <form method="post" action="{% url 'driver_application' %}" enctype="multipart/form-data">
                 <div class="modal-body">
                     {% csrf_token %}
                     {% if driver_form.errors %}
@@ -80,6 +81,14 @@
                     </div>
                     {% endif %}
                     {{ driver_form|crispy }}
+                    <div class="mb-3">
+                        <label class="form-label">Driver's License</label>
+                        <input type="file" 
+                               name="license_image" 
+                               class="form-control"
+                               accept="image/jpeg,image/png,application/pdf" 
+                               required>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

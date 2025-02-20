@@ -17,4 +17,6 @@ urlpatterns = [
     path('accept-ride/<int:transaction_id>/', views.accept_ride, name='accept_ride'),
     path('complete-ride/<int:transaction_id>/', views.complete_ride, name='complete_ride'),
     path('cancel-ride/<int:transaction_id>/', views.cancel_ride, name='cancel_ride'),
+    path('signup/', views.register, name='signup'),
+    path('terms/', views.terms, name='terms'),
 ]

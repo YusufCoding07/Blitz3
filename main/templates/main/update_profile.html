@@ -42,7 +42,9 @@
                                    name="profile_picture"
                                    accept="image/*"
                                    class="form-control {% if form.profile_picture.errors %}is-invalid{% endif %}"
-                                   id="id_profile_picture">
+                                   id="id_profile_picture"
+                                   onchange="validateFileSize(this)"
+                                   max="5242880">
                             {% if form.profile_picture.errors %}
                             <div class="invalid-feedback">
                                 {{ form.profile_picture.errors.0 }}
@@ -103,4 +105,13 @@
         box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
     }
 </style>
+
+<script>
+const validateFileSize = (input) => {
+    if (input.files[0].size > 5242880) { // 5MB
+        alert('File size must be less than 5MB');
+        input.value = '';
+    }
+};
+</script>
 {% endblock %}

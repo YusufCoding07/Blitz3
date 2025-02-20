@@ -52,30 +52,36 @@
     <!-- Ride Filter Section -->
     <div class="card mb-4">
         <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label">Price Range</label>
-                    <input type="range" class="form-range" min="0" max="100" id="priceRange">
+            <form id="filter-form" method="GET">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Price Range</label>
+                        <input type="range" name="price_range" class="form-range" min="0" max="100" id="priceRange">
+                        <div class="d-flex justify-content-between">
+                            <small>£0</small>
+                            <small>£100</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Ride Type</label>
+                        <select name="ride_type" class="form-select">
+                            <option value="">All Types</option>
+                            <option value="standard">Standard</option>
+                            <option value="premium">Premium</option>
+                            <option value="group">Group</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Sort By</label>
+                        <select class="form-select">
+                            <option>Best Match</option>
+                            <option>Price: Low to High</option>
+                            <option>Price: High to Low</option>
+                            <option>Distance</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Ride Type</label>
-                    <select class="form-select">
-                        <option>All Types</option>
-                        <option>Standard</option>
-                        <option>Premium</option>
-                        <option>Group</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Sort By</label>
-                    <select class="form-select">
-                        <option>Best Match</option>
-                        <option>Price: Low to High</option>
-                        <option>Price: High to Low</option>
-                        <option>Distance</option>
-                    </select>
-                </div>
-            </div>
+            </form>
         </div>
     </div>
 
@@ -91,7 +97,8 @@
                              width="60"
                              height="60"
                              alt="Driver"
-                             onerror="this.src='{% static 'images/user-avatar.png' %}'">
+                             data-default-src="{% static 'images/default-avatar.png' %}"
+                             onerror="this.onerror=null; this.src=this.getAttribute('data-default-src')"> 
                         <div>
                             <h5 class="mb-0">{{ ride.driver.username }}</h5>
                             <small class="text-muted">{{ ride.get_ride_type_display }}</small>
@@ -122,7 +129,8 @@
                             <h4 class="mb-0">£{{ ride.fare }}</h4>
                             <small class="text-muted">includes all charges</small>
                         </div>
-                        <button class="btn btn-primary">
+                        <button class="btn btn-primary" onclick="bookRide(this)">
+                            <span class="spinner-border spinner-border-sm d-none" role="status"></span>
                             <i class="fa-solid fa-car-side"></i> Book Now
                         </button>
                     </div>

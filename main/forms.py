@@ -7,6 +7,12 @@ from .models import UserProfile
 class UserRegistrationForm(UserCreationForm):
     email = forms.EmailField()
 
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("Email already exists")
+        return email
+
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2']
@@ -25,3 +31,9 @@ class DriverApplicationForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['phone_number', 'car_model', 'has_valid_license']
+
+    def clean_phone_number(self):
+        phone = self.cleaned_data.get('phone_number')
+        if not phone:
+            raise forms.ValidationError("Phone number is required for drivers")
+        return phone

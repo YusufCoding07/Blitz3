@@ -17,11 +17,18 @@ Including another URLconf
 # Blitz3/urls.py
 from django.contrib import admin
 from django.urls import path, include
-from main import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('main.urls')),  # Your app's URLs
-    path('accounts/', include('django.contrib.auth.urls')),  # Add this line
-    path('signup/', views.signup, name='signup'),
+    path('', include('main.urls')),  # Main app URLs
+    path('accounts/', include('django.contrib.auth.urls')),  # Auth URLs
+    # Remove duplicate signup URL since it's in main.urls
+    # path('signup/', views.signup, name='signup'),
 ]
+
+# Add static and media URLs for development
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
