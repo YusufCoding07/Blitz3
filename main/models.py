@@ -6,6 +6,13 @@ from cloudinary.models import CloudinaryField
 from django.utils import timezone
 
 class UserProfile(models.Model):
+    DRIVER_STATUS_CHOICES = [
+        ('not_applied', 'Not Applied'),
+        ('pending', 'Application Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected')
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     is_driver = models.BooleanField(default=False)
@@ -14,6 +21,14 @@ class UserProfile(models.Model):
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
+    driver_status = models.CharField(
+        max_length=20,
+        choices=DRIVER_STATUS_CHOICES,
+        default='not_applied'
+    )
+    license_file = models.FileField(upload_to='licenses/', blank=True, null=True)
+    application_date = models.DateTimeField(null=True, blank=True)
+    admin_notes = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.user.username

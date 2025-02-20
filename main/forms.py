@@ -30,7 +30,10 @@ class UserProfileForm(forms.ModelForm):
 class DriverApplicationForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['phone_number', 'car_model', 'has_valid_license']
+        fields = ['phone_number', 'car_model', 'license_file']
+        widgets = {
+            'license_file': forms.FileInput(attrs={'class': 'form-control'})
+        }
 
     def clean_phone_number(self):
         phone = self.cleaned_data.get('phone_number')

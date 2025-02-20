@@ -9,6 +9,7 @@ from .models import Transaction, UserProfile
 from .forms import UserProfileForm, DriverApplicationForm, UserRegistrationForm
 import logging
 import traceback
+from django.utils import timezone
 
 logger = logging.getLogger('django')
 
@@ -128,14 +129,18 @@ def update_profile(request):
 @login_required
 def driver_application(request):
     if request.method == 'POST':
-        form = DriverApplicationForm(request.POST, instance=request.user.userprofile)
+        form = DriverApplicationForm(request.POST, request.FILES, instance=request.user.userprofile)
         if form.is_valid():
             profile = form.save(commit=False)
-            profile.is_driver = True
+            profile.driver_status = 'pending'
+            profile.application_date = timezone.now()
             profile.save()
-            messages.success(request, 'Your driver application has been approved!')
+            messages.success(request, 'Your driver application has been submitted and is pending review.')
             return redirect('profile')
-    return redirect('profile')
+    else:
+        form = DriverApplicationForm(instance=request.user.userprofile)
+    
+    return render(request, 'main/driver_application.html', {'form': form})
 
 @login_required
 def request_ride(request):
