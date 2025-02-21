@@ -3,8 +3,8 @@ from .models import UserProfile, Transaction
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'phone_number', 'is_driver', 'driver_status', 'application_date')
-    list_filter = ('is_driver', 'driver_status', 'has_valid_license')
+    list_display = ('user', 'phone_number', 'is_driver', 'driver_status')
+    list_filter = ('is_driver', 'driver_status')
     search_fields = ('user__username', 'phone_number')
     readonly_fields = ('created_at', 'updated_at')
     
@@ -44,6 +44,7 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ('user', 'amount', 'description', 'date')
-    search_fields = ('user__username', 'description')
-    list_filter = ('date',)
+    list_display = ('user', 'driver', 'pickup_location', 'dropoff_location', 'amount', 'status', 'created_at')
+    list_filter = ('status', 'created_at')
+    search_fields = ('user__username', 'driver__username', 'pickup_location', 'dropoff_location')
+    readonly_fields = ('created_at', 'updated_at')
