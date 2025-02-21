@@ -173,7 +173,8 @@ CLOUDINARY_STORAGE = {
 # Set the default file storage to Cloudinary
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 # Make sure you have this for user profile
 AUTH_PROFILE_MODULE = 'main.UserProfile'
