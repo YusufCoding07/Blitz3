@@ -11,6 +11,7 @@ import logging
 import traceback
 from django.utils import timezone
 from django.db.models import Q
+from django import forms
 
 logger = logging.getLogger('django')
 
@@ -161,26 +162,28 @@ def update_profile(request):
     
     return render(request, 'main/update_profile.html', {'form': form})
 
+class DriverApplicationForm(forms.Form):
+    car_model = forms.CharField(max_length=100)
+    license_file = forms.FileField(label='Driver License')  # Changed from 'document' to 'license_file'
+
 @login_required
 def driver_application(request):
-    profile = request.user.userprofile
-    
     if request.method == 'POST':
         form = DriverApplicationForm(request.POST, request.FILES)
         if form.is_valid():
-            profile.driver_document = form.cleaned_data['document']
+            profile = request.user.userprofile
+            profile.car_model = form.cleaned_data['car_model']
+            profile.license_file = form.cleaned_data['license_file']  # Changed from 'document'
             profile.driver_status = 'pending'
             profile.application_date = timezone.now()
             profile.save()
-            messages.success(request, 'Application submitted for review!')
+            
+            messages.success(request, 'Your driver application has been submitted successfully!')
             return redirect('profile')
     else:
         form = DriverApplicationForm()
-
-    return render(request, 'main/driver_application.html', {
-        'form': form,
-        'profile': profile
-    })
+    
+    return render(request, 'main/driver_application.html', {'form': form})
 
 @login_required
 def request_ride(request):
