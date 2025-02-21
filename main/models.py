@@ -11,7 +11,7 @@ class UserProfile(models.Model):
     phone_number = models.CharField(max_length=15, null=True, blank=True)
     is_driver = models.BooleanField(default=False)
     has_valid_license = models.BooleanField(default=False)
-    car_model = models.CharField(max_length=100, blank=True)
+    car_model = models.CharField(max_length=100, default='')
     profile_picture = models.ImageField(upload_to='profile_pics/', default='', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -26,7 +26,7 @@ class UserProfile(models.Model):
         ],
         default='pending'
     )
-    license_file = models.FileField(upload_to='driver_documents/', blank=True)
+    license_file = models.FileField(upload_to='driver_documents/', null=True, blank=True)
     application_date = models.DateTimeField(null=True, blank=True)
     admin_notes = models.TextField(null=True, blank=True)
 
