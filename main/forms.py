@@ -6,30 +6,27 @@ from .models import UserProfile, Transaction
 
 class SignUpForm(UserCreationForm):
     username = forms.CharField(
-        max_length=150,
-        required=True,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     email = forms.EmailField(
-        max_length=254,
-        required=True,
         widget=forms.EmailInput(attrs={'class': 'form-control'})
     )
     location = forms.CharField(
-        label='Your Location',
         max_length=200,
-        required=True,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Enter your city (e.g., London)'
-        })
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your city (e.g., London)',
+                'required': 'required'
+            }
+        )
     )
     password1 = forms.CharField(
         label='Password',
         widget=forms.PasswordInput(attrs={'class': 'form-control'})
     )
     password2 = forms.CharField(
-        label='Confirm Password',
+        label='Password confirmation',
         widget=forms.PasswordInput(attrs={'class': 'form-control'})
     )
 
