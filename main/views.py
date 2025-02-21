@@ -14,6 +14,7 @@ from django.db.models import Q
 from django import forms
 from django.db import transaction
 from decimal import Decimal
+from datetime import datetime
 
 logger = logging.getLogger('django')
 
@@ -39,7 +40,7 @@ def home(request):
 @login_required
 def profile(request):
     if request.method == 'POST':
-        form = ProfileUpdateForm(request.POST, instance=request.user.userprofile)
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.userprofile)
         if form.is_valid():
             form.save()
             messages.success(request, 'Your profile has been updated!')

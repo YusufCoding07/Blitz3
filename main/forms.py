@@ -85,6 +85,13 @@ class DriverApplicationForm(forms.ModelForm):
         return phone
 
 class ProfileUpdateForm(forms.ModelForm):
+    profile_picture = forms.ImageField(
+        required=False,
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'accept': 'image/*'
+        })
+    )
     location = forms.CharField(
         max_length=200,
         required=False,
@@ -105,7 +112,7 @@ class ProfileUpdateForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
-        fields = ['location', 'bio']
+        fields = ['profile_picture', 'location', 'bio']
 
 class RideCreateForm(forms.ModelForm):
     class Meta:
