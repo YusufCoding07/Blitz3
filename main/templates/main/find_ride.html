@@ -37,24 +37,26 @@
                                 {% endif %}
                             </div>
                             
-                            <!-- Simplified condition for testing -->
-                            {% if user.userprofile.is_driver %}
-                                {% if user.userprofile.driver_status == 'approved' %}
-                                    {% if ride.user.id != user.id %}
+                            <!-- Show buttons based on user role -->
+                            {% if ride.user.id == user.id %}
+                                <span class="badge bg-info">Your Ride</span>
+                            {% else %}
+                                {% if user.userprofile.is_driver %}
+                                    {% if user.userprofile.driver_status == 'approved' %}
                                         <a href="{% url 'accept_ride' ride.id %}" 
                                            class="btn btn-success"
                                            onclick="return confirm('Are you sure you want to accept this ride?')">
-                                            Accept Ride
+                                            Accept Ride (Driver)
                                         </a>
                                     {% else %}
-                                        <span class="badge bg-info">Your Ride</span>
+                                        <span class="badge bg-warning">Driver Approval Pending</span>
                                     {% endif %}
                                 {% else %}
-                                    <span class="badge bg-warning">Approval Pending</span>
-                                {% endif %}
-                            {% else %}
-                                {% if ride.user.id == user.id %}
-                                    <span class="badge bg-info">Your Ride</span>
+                                    <a href="{% url 'accept_ride' ride.id %}" 
+                                       class="btn btn-primary"
+                                       onclick="return confirm('Are you sure you want to accept this ride?')">
+                                        Accept Ride
+                                    </a>
                                 {% endif %}
                             {% endif %}
                         </div>

@@ -199,14 +199,9 @@ def request_ride(request):
 def accept_ride(request, ride_id):
     ride = get_object_or_404(Transaction, id=ride_id, status='pending')
     
-    # Check if user is a driver
-    if not request.user.userprofile.is_driver:
-        messages.error(request, 'Only approved drivers can accept rides.')
-        return redirect('find_ride')
-    
-    # Check if driver is approved
-    if request.user.userprofile.driver_status != 'approved':
-        messages.error(request, 'Your driver application must be approved first.')
+    # Don't allow accepting your own ride
+    if request.user == ride.user:
+        messages.error(request, 'You cannot accept your own ride.')
         return redirect('find_ride')
     
     try:
@@ -225,9 +220,9 @@ def accept_ride(request, ride_id):
                 description=f'Payment for ride from {ride.pickup_location} to {ride.dropoff_location}'
             )
             
-            # Create earning transaction for the driver
+            # Create earning transaction for the accepting user
             Transaction.objects.create(
-                user=request.user,  # driver
+                user=request.user,  # accepting user (driver or passenger)
                 amount=ride.amount,  # positive amount for earning
                 status='completed',
                 pickup_location=ride.pickup_location,
