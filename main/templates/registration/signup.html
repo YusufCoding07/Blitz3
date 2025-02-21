@@ -28,21 +28,7 @@
 
                     <form method="post" novalidate>
                         {% csrf_token %}
-                        <div class="mb-3">
-                            {{ form.username|as_crispy_field }}
-                        </div>
-                        <div class="mb-3">
-                            {{ form.email|as_crispy_field }}
-                        </div>
-                        <div class="mb-3">
-                            {{ form.location|as_crispy_field }}
-                        </div>
-                        <div class="mb-3">
-                            {{ form.password1|as_crispy_field }}
-                        </div>
-                        <div class="mb-3">
-                            {{ form.password2|as_crispy_field }}
-                        </div>
+                        {{ form|crispy }}
                         <button type="submit" class="btn btn-primary w-100">Sign Up</button>
                     </form>
                     <div class="mt-3 text-center">

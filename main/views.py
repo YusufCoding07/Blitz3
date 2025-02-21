@@ -304,7 +304,7 @@ def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            user = form.save()  # This will also create the UserProfile
+            user = form.save()
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
@@ -315,7 +315,4 @@ def signup(request):
             messages.error(request, 'Please correct the errors below.')
     else:
         form = SignUpForm()
-    return render(request, 'registration/signup.html', {
-        'form': form,
-        'form_errors': form.errors
-    })
+    return render(request, 'registration/signup.html', {'form': form})
