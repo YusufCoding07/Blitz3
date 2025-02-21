@@ -284,13 +284,21 @@ def create_ride(request):
     if request.method == 'POST':
         form = RideCreateForm(request.POST)
         if form.is_valid():
-            ride = form.save(commit=False)
-            ride.user = request.user
-            ride.save()
-            messages.success(request, 'Ride request created successfully!')
-            return redirect('transactions')
+            try:
+                ride = form.save(commit=False)
+                ride.user = request.user
+                ride.status = 'pending'
+                ride.transaction_type = 'ride'  # Set the transaction type
+                ride.driver = None  # Initialize driver as None
+                ride.save()
+                messages.success(request, 'Ride posted successfully!')
+                return redirect('find_ride')
+            except Exception as e:
+                messages.error(request, f'Error creating ride: {str(e)}')
+                return redirect('create_ride')
     else:
         form = RideCreateForm()
+    
     return render(request, 'main/create_ride.html', {'form': form})
 
 @login_required
