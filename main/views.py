@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
@@ -79,7 +79,7 @@ def map_view(request):
 # Transactions Page
 @login_required
 def transactions(request):
-    transactions = Transaction.objects.filter(user=request.user).order_by('-date')
+    transactions = Transaction.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'main/transactions.html', {'transactions': transactions})
 
 def register(request):
@@ -109,27 +109,39 @@ def logout_view(request):
     logout(request)
     return redirect('home')
 
+@login_required
 def find_ride(request):
-    form = RideSearchForm(request.GET)
-    rides = Ride.objects.filter(status='open')
+    # Get filter parameters from request
+    pickup = request.GET.get('pickup', '')
+    dropoff = request.GET.get('dropoff', '')
+    sort = request.GET.get('sort', '-created_at')
     
-    if form.is_valid():
-        pickup = form.cleaned_data.get('pickup')
-        destination = form.cleaned_data.get('destination')
-        date = form.cleaned_data.get('date')
-        
-        if pickup:
-            rides = rides.filter(pickup_location__icontains=pickup)
-        if destination:
-            rides = rides.filter(dropoff_location__icontains=destination)
-        if date:
-            rides = rides.filter(date=date)
+    # Base queryset
+    rides = Transaction.objects.filter(status='pending')
+    
+    # Apply filters if provided
+    if pickup:
+        rides = rides.filter(pickup_location__icontains=pickup)
+    if dropoff:
+        rides = rides.filter(dropoff_location__icontains=dropoff)
+    
+    # Apply sorting
+    if sort == 'price_low':
+        rides = rides.order_by('amount')
+    elif sort == 'price_high':
+        rides = rides.order_by('-amount')
+    else:
+        rides = rides.order_by('-created_at')
     
     context = {
-        'form': form,
         'rides': rides,
-        'show_results': request.GET.get('pickup') or request.GET.get('destination') or request.GET.get('date')
+        'current_filters': {
+            'pickup': pickup,
+            'dropoff': dropoff,
+            'sort': sort
+        }
     }
+    
     return render(request, 'main/find_ride.html', context)
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -176,15 +188,16 @@ def request_ride(request):
     return render(request, 'main/find_ride.html')
 
 @login_required
-def accept_ride(request, transaction_id):
-    try:
-        transaction = Transaction.objects.get(id=transaction_id)
-        # Add your ride acceptance logic here
+def accept_ride(request, ride_id):
+    ride = get_object_or_404(Transaction, id=ride_id)
+    if ride.status == 'pending':
+        ride.driver = request.user
+        ride.status = 'accepted'
+        ride.save()
         messages.success(request, 'Ride accepted successfully!')
-        return redirect('home')
-    except Transaction.DoesNotExist:
-        messages.error(request, 'Ride not found.')
-        return redirect('home')
+    else:
+        messages.error(request, 'This ride is no longer available.')
+    return redirect('find_ride')
 
 @login_required
 def complete_ride(request, transaction_id):
@@ -213,19 +226,31 @@ def terms(request):
 
 @login_required
 def create_ride(request):
-    if not request.user.userprofile.is_driver:
-        messages.error(request, "Only verified drivers can create rides.")
-        return redirect('profile')
-
     if request.method == 'POST':
         form = RideCreateForm(request.POST)
         if form.is_valid():
             ride = form.save(commit=False)
-            ride.driver = request.user
+            ride.user = request.user
             ride.save()
-            messages.success(request, "Ride created successfully!")
-            return redirect('find_ride')
+            messages.success(request, 'Ride request created successfully!')
+            return redirect('transactions')
     else:
         form = RideCreateForm()
-    
     return render(request, 'main/create_ride.html', {'form': form})
+
+@login_required
+def search_rides(request):
+    if request.method == 'POST':
+        form = RideSearchForm(request.POST)
+        if form.is_valid():
+            pickup = form.cleaned_data['pickup_location']
+            dropoff = form.cleaned_data['dropoff_location']
+            rides = Transaction.objects.filter(
+                status='pending',
+                pickup_location__icontains=pickup,
+                dropoff_location__icontains=dropoff
+            ).order_by('-created_at')
+            return render(request, 'main/search_results.html', {'rides': rides})
+    else:
+        form = RideSearchForm()
+    return render(request, 'main/search_rides.html', {'form': form})

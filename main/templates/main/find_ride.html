@@ -7,33 +7,15 @@
         <h1 class="display-4 mb-4">Find Your Ride</h1>
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <form class="card card-body" action="{% url 'find_ride' %}" method="POST">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <input type="text"
-                               class="form-control form-control-lg"
-                               name="pickup_location"
-                               placeholder="Enter pickup location"
-                               required>
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h4 class="card-title">Find a Ride</h4>
+                        <form method="get">
+                            {{ form|crispy }}
+                            <button type="submit" class="btn btn-primary mt-3">Search Rides</button>
+                        </form>
                     </div>
-                    <div class="mb-3">
-                        <input type="text"
-                               class="form-control form-control-lg"
-                               name="destination"
-                               placeholder="Enter destination"
-                               required>
-                    </div>
-                    <div class="mb-3">
-                        <select class="form-select form-select-lg" name="ride_type">
-                            <option value="standard">Standard</option>
-                            <option value="premium">Premium</option>
-                            <option value="group">Group</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-lg w-100">
-                        <i class="fa-solid fa-magnifying-glass"></i> Search Rides
-                    </button>
-                </form>
+                </div>
             </div>
         </div>
     </div>
@@ -49,37 +31,27 @@
 <div class="container my-5">
     <h2 class="mb-4">Available Rides</h2>
 
-    <!-- Ride Filter Section -->
+    <!-- Filter Section -->
     <div class="card mb-4">
         <div class="card-body">
-            <form id="filter-form" method="GET">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label">Price Range</label>
-                        <input type="range" name="price_range" class="form-range" min="0" max="100" id="priceRange">
-                        <div class="d-flex justify-content-between">
-                            <small>£0</small>
-                            <small>£100</small>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Ride Type</label>
-                        <select name="ride_type" class="form-select">
-                            <option value="">All Types</option>
-                            <option value="standard">Standard</option>
-                            <option value="premium">Premium</option>
-                            <option value="group">Group</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Sort By</label>
-                        <select class="form-select">
-                            <option>Best Match</option>
-                            <option>Price: Low to High</option>
-                            <option>Price: High to Low</option>
-                            <option>Distance</option>
-                        </select>
-                    </div>
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="pickup" 
+                           placeholder="Pickup Location" value="{{ current_filters.pickup }}">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="dropoff" 
+                           placeholder="Dropoff Location" value="{{ current_filters.dropoff }}">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="sort">
+                        <option value="-created_at" {% if current_filters.sort == '-created_at' %}selected{% endif %}>Newest First</option>
+                        <option value="price_low" {% if current_filters.sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_high" {% if current_filters.sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
                 </div>
             </form>
         </div>
@@ -89,58 +61,28 @@
     <div class="row g-4">
         {% for ride in rides %}
         <div class="col-md-6 col-lg-4">
-            <div class="card ride-card h-100">
+            <div class="card h-100">
                 <div class="card-body">
-                    <div class="d-flex align-items-center mb-3">
-                        <img src="{% static 'images/driver-avatar.png' %}"
-                             class="rounded-circle me-3"
-                             width="60"
-                             height="60"
-                             alt="Driver"
-                             data-default-src="{% static 'images/default-avatar.png' %}"
-                             onerror="this.onerror=null; this.src=this.getAttribute('data-default-src')"> 
-                        <div>
-                            <h5 class="mb-0">{{ ride.driver.username }}</h5>
-                            <small class="text-muted">{{ ride.get_ride_type_display }}</small>
-                            <div class="rating">
-                                <i class="fa-solid fa-star text-warning"></i>
-                                <span class="ms-1">4.9 (256 rides)</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <p class="mb-2">
-                            <i class="fa-solid fa-location-dot text-primary me-2"></i>
-                            {{ ride.start_location }}
-                        </p>
-                        <p class="mb-2">
-                            <i class="fa-solid fa-flag-checkered text-success me-2"></i>
-                            {{ ride.end_location }}
-                        </p>
-                        <p class="mb-0">
-                            <i class="fa-solid fa-clock text-info me-2"></i>
-                            {{ ride.estimated_time }} mins away
-                        </p>
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4 class="mb-0">£{{ ride.fare }}</h4>
-                            <small class="text-muted">includes all charges</small>
-                        </div>
-                        <button class="btn btn-primary" onclick="bookRide(this)">
-                            <span class="spinner-border spinner-border-sm d-none" role="status"></span>
-                            <i class="fa-solid fa-car-side"></i> Book Now
-                        </button>
-                    </div>
+                    <h5 class="card-title">₦{{ ride.amount }}</h5>
+                    <p class="card-text">
+                        <strong>From:</strong> {{ ride.pickup_location }}<br>
+                        <strong>To:</strong> {{ ride.dropoff_location }}<br>
+                        <strong>Posted:</strong> {{ ride.created_at|timesince }} ago
+                    </p>
+                    {% if user.userprofile.is_driver and user.userprofile.driver_status == 'approved' %}
+                        <form method="post" action="{% url 'accept_ride' ride.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">Accept Ride</button>
+                        </form>
+                    {% endif %}
                 </div>
             </div>
         </div>
         {% empty %}
-        <div class="col-12 text-center py-5">
-            <h4 class="text-muted">No rides available matching your criteria</h4>
-            <p class="text-muted">Try adjusting your filters or search area</p>
+        <div class="col-12">
+            <div class="alert alert-info">
+                No rides available matching your criteria.
+            </div>
         </div>
         {% endfor %}
     </div>
