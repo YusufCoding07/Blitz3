@@ -34,8 +34,7 @@ class UserProfile(models.Model):
         return f"{self.user.username}'s Profile"
 
 class Transaction(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    driver = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='driver_transactions')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_transactions')
     pickup_location = models.CharField(max_length=200)
     dropoff_location = models.CharField(max_length=200)
     amount = models.DecimalField(max_digits=10, decimal_places=2)

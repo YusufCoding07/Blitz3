@@ -23,7 +23,7 @@
                             <td>{{ transaction.created_at|date:"M d, Y" }}</td>
                             <td>{{ transaction.pickup_location }}</td>
                             <td>{{ transaction.dropoff_location }}</td>
-                            <td>₦{{ transaction.amount }}</td>
+                            <td>£{{ transaction.amount }}</td>
                             <td>
                                 <span class="badge {% if transaction.status == 'completed' %}bg-success{% elif transaction.status == 'pending' %}bg-warning{% elif transaction.status == 'cancelled' %}bg-danger{% else %}bg-info{% endif %}">
                                     {{ transaction.status|title }}
