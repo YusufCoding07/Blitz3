@@ -304,18 +304,18 @@ def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            # Create user profile with location
-            UserProfile.objects.create(
-                user=user,
-                location=form.cleaned_data.get('location')
-            )
+            user = form.save()  # This will also create the UserProfile
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
             messages.success(request, 'Account created successfully!')
             return redirect('home')
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = SignUpForm()
-    return render(request, 'registration/signup.html', {'form': form})
+    return render(request, 'registration/signup.html', {
+        'form': form,
+        'form_errors': form.errors
+    })
