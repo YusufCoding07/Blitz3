@@ -5,11 +5,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import Transaction, UserProfile
-from .forms import UserProfileForm, DriverApplicationForm, UserRegistrationForm
+from .models import Transaction, UserProfile, Ride
+from .forms import UserProfileForm, DriverApplicationForm, UserRegistrationForm, RideCreateForm, RideSearchForm
 import logging
 import traceback
 from django.utils import timezone
+from django.db.models import Q
 
 logger = logging.getLogger('django')
 
@@ -109,7 +110,27 @@ def logout_view(request):
     return redirect('home')
 
 def find_ride(request):
-    return render(request, 'main/find_ride.html')
+    form = RideSearchForm(request.GET)
+    rides = Ride.objects.filter(status='open')
+    
+    if form.is_valid():
+        pickup = form.cleaned_data.get('pickup')
+        destination = form.cleaned_data.get('destination')
+        date = form.cleaned_data.get('date')
+        
+        if pickup:
+            rides = rides.filter(pickup_location__icontains=pickup)
+        if destination:
+            rides = rides.filter(dropoff_location__icontains=destination)
+        if date:
+            rides = rides.filter(date=date)
+    
+    context = {
+        'form': form,
+        'rides': rides,
+        'show_results': request.GET.get('pickup') or request.GET.get('destination') or request.GET.get('date')
+    }
+    return render(request, 'main/find_ride.html', context)
 
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -128,19 +149,24 @@ def update_profile(request):
 
 @login_required
 def driver_application(request):
+    profile = request.user.userprofile
+    
     if request.method == 'POST':
-        form = DriverApplicationForm(request.POST, request.FILES, instance=request.user.userprofile)
+        form = DriverApplicationForm(request.POST, request.FILES)
         if form.is_valid():
-            profile = form.save(commit=False)
+            profile.driver_document = form.cleaned_data['document']
             profile.driver_status = 'pending'
             profile.application_date = timezone.now()
             profile.save()
-            messages.success(request, 'Your driver application has been submitted and is pending review.')
+            messages.success(request, 'Application submitted for review!')
             return redirect('profile')
     else:
-        form = DriverApplicationForm(instance=request.user.userprofile)
-    
-    return render(request, 'main/driver_application.html', {'form': form})
+        form = DriverApplicationForm()
+
+    return render(request, 'main/driver_application.html', {
+        'form': form,
+        'profile': profile
+    })
 
 @login_required
 def request_ride(request):
@@ -184,3 +210,22 @@ def cancel_ride(request, transaction_id):
 
 def terms(request):
     return render(request, 'main/terms.html')
+
+@login_required
+def create_ride(request):
+    if not request.user.userprofile.is_driver:
+        messages.error(request, "Only verified drivers can create rides.")
+        return redirect('profile')
+
+    if request.method == 'POST':
+        form = RideCreateForm(request.POST)
+        if form.is_valid():
+            ride = form.save(commit=False)
+            ride.driver = request.user
+            ride.save()
+            messages.success(request, "Ride created successfully!")
+            return redirect('find_ride')
+    else:
+        form = RideCreateForm()
+    
+    return render(request, 'main/create_ride.html', {'form': form})
