@@ -4,6 +4,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from cloudinary.models import CloudinaryField
 from django.utils import timezone
+from decimal import Decimal
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -33,28 +34,35 @@ class UserProfile(models.Model):
         return f"{self.user.username}'s profile"
 
 class Transaction(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_transactions')
+    TRANSACTION_TYPES = [
+        ('ride', 'Ride Posting'),
+        ('payment', 'Payment'),
+        ('earning', 'Earning'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    driver = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='driven_transactions')
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    transaction_type = models.CharField(max_length=20, choices=TRANSACTION_TYPES, default='ride')
     pickup_location = models.CharField(max_length=200)
     dropoff_location = models.CharField(max_length=200)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(
-        max_length=20,
-        choices=[
-            ('pending', 'Pending'),
-            ('accepted', 'Accepted'),
-            ('completed', 'Completed'),
-            ('cancelled', 'Cancelled')
-        ],
-        default='pending'
-    )
+    description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return f"Ride from {self.pickup_location} to {self.dropoff_location}"
-
     class Meta:
         ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username}'s {self.transaction_type} - {self.amount}"
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
