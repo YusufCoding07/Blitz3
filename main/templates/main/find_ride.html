@@ -1,5 +1,6 @@
 {% extends 'main/base.html' %}
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 <div class="hero-section">
@@ -11,7 +12,7 @@
                     <div class="card-body">
                         <h4 class="card-title">Find a Ride</h4>
                         <form method="get">
-                            {{ form|crispy }}
+                            {% crispy form %}
                             <button type="submit" class="btn btn-primary mt-3">Search Rides</button>
                         </form>
                     </div>
