@@ -12,6 +12,8 @@ import traceback
 from django.utils import timezone
 from django.db.models import Q
 from django import forms
+from django.db import transaction
+from decimal import Decimal
 
 logger = logging.getLogger('django')
 
@@ -194,15 +196,50 @@ def request_ride(request):
 
 @login_required
 def accept_ride(request, ride_id):
-    ride = get_object_or_404(Transaction, id=ride_id)
-    if ride.status == 'pending':
-        ride.driver = request.user
-        ride.status = 'accepted'
-        ride.save()
+    ride = get_object_or_404(Transaction, id=ride_id, status='pending')
+    
+    # Check if user is a driver
+    if not request.user.userprofile.is_driver:
+        messages.error(request, 'Only approved drivers can accept rides.')
+        return redirect('find_ride')
+    
+    # Check if driver is approved
+    if request.user.userprofile.driver_status != 'approved':
+        messages.error(request, 'Your driver application must be approved first.')
+        return redirect('find_ride')
+    
+    try:
+        with transaction.atomic():
+            # Update the ride status
+            ride.status = 'accepted'
+            ride.save()
+            
+            # Create payment transaction for the passenger
+            Transaction.objects.create(
+                user=ride.user,  # passenger
+                amount=-ride.amount,  # negative amount for payment
+                status='completed',
+                pickup_location=ride.pickup_location,
+                dropoff_location=ride.dropoff_location,
+                description=f'Payment for ride from {ride.pickup_location} to {ride.dropoff_location}'
+            )
+            
+            # Create earning transaction for the driver
+            Transaction.objects.create(
+                user=request.user,  # driver
+                amount=ride.amount,  # positive amount for earning
+                status='completed',
+                pickup_location=ride.pickup_location,
+                dropoff_location=ride.dropoff_location,
+                description=f'Earnings from ride {ride.pickup_location} to {ride.dropoff_location}'
+            )
+            
         messages.success(request, 'Ride accepted successfully!')
-    else:
-        messages.error(request, 'This ride is no longer available.')
-    return redirect('find_ride')
+        return redirect('transactions')
+        
+    except Exception as e:
+        messages.error(request, 'An error occurred while accepting the ride. Please try again.')
+        return redirect('find_ride')
 
 @login_required
 def complete_ride(request, transaction_id):

@@ -20,12 +20,14 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.views import LogoutView
+from main import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main.urls')),  # Main app URLs
     path('accounts/', include('django.contrib.auth.urls')),  # Auth URLs
     path('logout/', LogoutView.as_view(next_page='home'), name='logout'),  # Add this line
+    path('accept-ride/<int:ride_id>/', views.accept_ride, name='accept_ride'),
 ]
 
 # Add static and media URLs for development
