@@ -1,0 +1,74 @@
+{% extends 'main/base.html' %}  <!-- Update this if your base template has different path -->
+{% load crispy_forms_tags %}  <!-- Add this line -->
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Driver Application</h3>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                    <div class="messages mb-3">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if user.userprofile.driver_status == 'approved' %}
+                        <div class="alert alert-success">
+                            You're already approved as a driver!
+                        </div>
+                    {% elif user.userprofile.driver_status == 'pending' %}
+                        <div class="alert alert-info">
+                            Your application is pending review. We'll notify you once it's processed.
+                        </div>
+                    {% elif user.userprofile.driver_status == 'rejected' %}
+                        <div class="alert alert-warning">
+                            Your previous application was not approved. You may submit a new application below.
+                        </div>
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ form|crispy }}
+                            <div class="alert alert-info mt-3">
+                                <h5>Requirements:</h5>
+                                <ul>
+                                    <li>Valid driver's license</li>
+                                    <li>Clean driving record</li>
+                                    <li>Vehicle information</li>
+                                    <li>Contact phone number</li>
+                                </ul>
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-3">
+                                Submit New Application
+                            </button>
+                        </form>
+                    {% else %}
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ form|crispy }}
+                            <div class="alert alert-info mt-3">
+                                <h5>Requirements:</h5>
+                                <ul>
+                                    <li>Valid driver's license</li>
+                                    <li>Clean driving record</li>
+                                    <li>Vehicle information</li>
+                                    <li>Contact phone number</li>
+                                </ul>
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-3">
+                                Submit Application
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
