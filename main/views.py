@@ -44,11 +44,22 @@ def profile(request):
     # Base query
     transactions = Transaction.objects.filter(user=request.user)
     
+    # Calculate statistics
+    earnings = transactions.filter(amount__gt=0)
+    spendings = transactions.filter(amount__lt=0)
+    
+    stats = {
+        'total_earnings': earnings.aggregate(Sum('amount'))['amount__sum'] or 0,
+        'total_spendings': abs(spendings.aggregate(Sum('amount'))['amount__sum'] or 0),
+        'avg_earnings': earnings.aggregate(Avg('amount'))['amount__avg'] or 0,
+        'avg_spendings': abs(spendings.aggregate(Avg('amount'))['amount__avg'] or 0),
+    }
+    
     # Apply filters based on transaction type
     if transaction_type == 'earnings':
-        transactions = transactions.filter(amount__gt=0)
+        transactions = earnings
     elif transaction_type == 'spendings':
-        transactions = transactions.filter(amount__lt=0)
+        transactions = spendings
     
     # Order by most recent
     transactions = transactions.order_by('-created_at')
@@ -66,7 +77,8 @@ def profile(request):
         'form': form,
         'user': request.user,
         'transactions': transactions,
-        'transaction_type': transaction_type
+        'transaction_type': transaction_type,
+        'stats': stats
     })
 
 # Map Page
