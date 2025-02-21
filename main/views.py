@@ -322,21 +322,28 @@ def terms(request):
 
 @login_required
 def create_ride(request):
+    if not request.user.userprofile.is_driver:
+        messages.error(request, 'You must be a driver to create rides.')
+        return redirect('home')
+        
+    # Check if driver is pending or rejected
+    if request.user.userprofile.driver_status != 'approved':
+        messages.warning(request, 'Your driver application is still pending approval. You cannot create rides yet.')
+        return redirect('home')
+
     if request.method == 'POST':
         form = RideCreateForm(request.POST)
         if form.is_valid():
-            try:
-                ride = form.save(commit=False)
-                ride.user = request.user
-                ride.status = 'pending'
-                ride.transaction_type = 'ride'  # Set the transaction type
-                ride.driver = None  # Initialize driver as None
-                ride.save()
-                messages.success(request, 'Ride posted successfully!')
-                return redirect('find_ride')
-            except Exception as e:
-                messages.error(request, f'Error creating ride: {str(e)}')
-                return redirect('create_ride')
+            ride = form.save(commit=False)
+            ride.user = request.user
+            ride.status = 'pending'
+            ride.transaction_type = 'ride'  # Set the transaction type
+            ride.driver = None  # Initialize driver as None
+            ride.save()
+            messages.success(request, 'Ride posted successfully!')
+            return redirect('find_ride')
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = RideCreateForm()
     
