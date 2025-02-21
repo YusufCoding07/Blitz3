@@ -10,7 +10,7 @@ from .forms import UserProfileForm, DriverApplicationForm, UserRegistrationForm,
 import logging
 import traceback
 from django.utils import timezone
-from django.db.models import Q
+from django.db.models import Q, Sum, Avg
 from django import forms
 from django.db import transaction
 from decimal import Decimal
@@ -39,6 +39,20 @@ def home(request):
 # Profile Page
 @login_required
 def profile(request):
+    transaction_type = request.GET.get('transaction_type', 'all')
+    
+    # Base query
+    transactions = Transaction.objects.filter(user=request.user)
+    
+    # Apply filters based on transaction type
+    if transaction_type == 'earnings':
+        transactions = transactions.filter(amount__gt=0)
+    elif transaction_type == 'spendings':
+        transactions = transactions.filter(amount__lt=0)
+    
+    # Order by most recent
+    transactions = transactions.order_by('-created_at')
+
     if request.method == 'POST':
         form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.userprofile)
         if form.is_valid():
@@ -51,7 +65,8 @@ def profile(request):
     return render(request, 'main/profile.html', {
         'form': form,
         'user': request.user,
-        'transactions': Transaction.objects.filter(user=request.user).order_by('-created_at')
+        'transactions': transactions,
+        'transaction_type': transaction_type
     })
 
 # Map Page
