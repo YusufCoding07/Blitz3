@@ -5,11 +5,12 @@ from django.contrib.auth.models import User
 from .models import UserProfile, Transaction
 
 class SignUpForm(UserCreationForm):
+    email = forms.EmailField(max_length=254, required=True, help_text='Required. Enter a valid email address.')
     location = forms.CharField(max_length=200, required=True, help_text='Your current city or area')
     
     class Meta:
         model = User
-        fields = ('username', 'email', 'password1', 'password2', 'location')
+        fields = ('username', 'email', 'location', 'password1', 'password2')
 
 class UserRegistrationForm(UserCreationForm):
     email = forms.EmailField()
