@@ -65,7 +65,12 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
-    instance.userprofile.save()
+    try:
+        if not hasattr(instance, 'userprofile'):
+            UserProfile.objects.create(user=instance)
+        instance.userprofile.save()
+    except Exception as e:
+        print(f"Error saving user profile: {e}")
 
 class Ride(models.Model):
     RIDE_STATUS_CHOICES = [
