@@ -85,9 +85,27 @@ class DriverApplicationForm(forms.ModelForm):
         return phone
 
 class ProfileUpdateForm(forms.ModelForm):
+    location = forms.CharField(
+        max_length=200,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your city (e.g., London)'
+        })
+    )
+    bio = forms.CharField(
+        max_length=500,
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 4,
+            'placeholder': 'Tell us about yourself...'
+        })
+    )
+
     class Meta:
         model = UserProfile
-        fields = ['phone_number', 'profile_picture']
+        fields = ['location', 'bio']
 
 class RideCreateForm(forms.ModelForm):
     class Meta:

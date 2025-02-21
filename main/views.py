@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Transaction, UserProfile, Ride
-from .forms import UserProfileForm, DriverApplicationForm, UserRegistrationForm, RideCreateForm, RideSearchForm, SignUpForm
+from .forms import UserProfileForm, DriverApplicationForm, UserRegistrationForm, RideCreateForm, RideSearchForm, SignUpForm, ProfileUpdateForm
 import logging
 import traceback
 from django.utils import timezone
@@ -38,24 +38,20 @@ def home(request):
 # Profile Page
 @login_required
 def profile(request):
-    try:
-        profile = request.user.userprofile
-    except UserProfile.DoesNotExist:
-        profile = UserProfile.objects.create(user=request.user)
-    
     if request.method == 'POST':
-        # Handle profile update
-        profile.phone_number = request.POST.get('phone_number', '')
-        profile.is_driver = request.POST.get('is_driver', False) == 'on'
-        profile.has_valid_license = request.POST.get('has_valid_license', False) == 'on'
-        profile.car_model = request.POST.get('car_model', '')
-        if 'profile_picture' in request.FILES:
-            profile.profile_picture = request.FILES['profile_picture']
-        profile.save()
-        messages.success(request, 'Your profile has been updated!')
-        return redirect('profile')
+        form = ProfileUpdateForm(request.POST, instance=request.user.userprofile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your profile has been updated!')
+            return redirect('profile')
+    else:
+        form = ProfileUpdateForm(instance=request.user.userprofile)
     
-    return render(request, 'main/profile.html', {'profile': profile})
+    return render(request, 'main/profile.html', {
+        'form': form,
+        'user': request.user,
+        'transactions': Transaction.objects.filter(user=request.user).order_by('-created_at')
+    })
 
 # Map Page
 def map_view(request):
