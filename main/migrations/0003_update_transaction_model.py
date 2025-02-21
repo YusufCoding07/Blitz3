@@ -3,7 +3,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('main', '0002_add_driver_application_fields'),
+        ('main', '0001_initial'),
     ]
 
     operations = [
