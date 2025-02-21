@@ -175,8 +175,9 @@ def driver_application(request):
         if form.is_valid():
             profile = request.user.userprofile
             profile.car_model = form.cleaned_data['car_model']
-            profile.license_file = form.cleaned_data['license_file']  # Changed from 'document'
+            profile.license_file = form.cleaned_data['license_file']
             profile.driver_status = 'pending'
+            profile.is_driver = True  # Set this flag when they apply
             profile.application_date = timezone.now()
             profile.save()
             

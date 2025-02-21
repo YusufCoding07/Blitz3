@@ -10,7 +10,7 @@ class UserProfile(models.Model):
     phone_number = models.CharField(max_length=15, null=True, blank=True)
     is_driver = models.BooleanField(default=False)
     has_valid_license = models.BooleanField(default=False)
-    car_model = models.CharField(max_length=100, null=True, blank=True)
+    car_model = models.CharField(max_length=100, blank=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', default='', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -19,19 +19,18 @@ class UserProfile(models.Model):
     driver_status = models.CharField(
         max_length=20,
         choices=[
-            ('not_applied', 'Not Applied'),
             ('pending', 'Pending'),
             ('approved', 'Approved'),
             ('rejected', 'Rejected')
         ],
-        default='not_applied'
+        default='pending'
     )
-    license_file = models.FileField(upload_to='licenses/', null=True, blank=True)
+    license_file = models.FileField(upload_to='driver_documents/', blank=True)
     application_date = models.DateTimeField(null=True, blank=True)
     admin_notes = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.user.username}'s Profile"
+        return f"{self.user.username}'s profile"
 
 class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_transactions')
