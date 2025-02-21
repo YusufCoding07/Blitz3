@@ -35,21 +35,28 @@ class UserProfile(models.Model):
 
 class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    driver = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='driver_transactions')
+    pickup_location = models.CharField(max_length=200)
+    dropoff_location = models.CharField(max_length=200)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    date = models.DateTimeField(auto_now_add=True)
-    description = models.CharField(max_length=200)
-    STATUS_CHOICES = (
-        ('pending', 'Pending'),
-        ('completed', 'Completed'),
-        ('failed', 'Failed'),
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ('pending', 'Pending'),
+            ('accepted', 'Accepted'),
+            ('completed', 'Completed'),
+            ('cancelled', 'Cancelled')
+        ],
+        default='pending'
     )
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.amount} - {self.date}"
+        return f"Ride from {self.pickup_location} to {self.dropoff_location}"
 
     class Meta:
-        ordering = ['-date']
+        ordering = ['-created_at']
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

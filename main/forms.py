@@ -50,6 +50,9 @@ class RideCreateForm(forms.ModelForm):
     class Meta:
         model = Transaction
         fields = ['pickup_location', 'dropoff_location', 'amount']
+        widgets = {
+            'amount': forms.NumberInput(attrs={'step': '0.01'})
+        }
 
 class RideSearchForm(forms.Form):
     pickup_location = forms.CharField(max_length=200)
