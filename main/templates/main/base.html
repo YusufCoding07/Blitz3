@@ -77,6 +77,9 @@
                         <a class="nav-link" href="{% url 'home' %}">Home</a>
                     </li>
                     {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'find_ride' %}">Find Ride</a>
+                        </li>
                         {% if user.userprofile.is_driver and user.userprofile.driver_status == 'approved' %}
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'create_ride' %}">Create Ride</a>
