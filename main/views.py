@@ -38,7 +38,7 @@ def home(request):
                 context['profile_error'] = str(e)
             
             try:
-                transactions = Transaction.objects.filter(user=request.user).order_by('-date')[:5]
+                transactions = Transaction.objects.filter(user=request.user).order_by('-created_at')[:5]
                 logger.info(f"Found {len(transactions)} transactions")
                 context['transactions'] = transactions
             except Exception as e:
