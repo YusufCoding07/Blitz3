@@ -6,57 +6,32 @@ from cloudinary.models import CloudinaryField
 from django.utils import timezone
 
 class UserProfile(models.Model):
-    DRIVER_STATUS_CHOICES = [
-        ('not_applied', 'Not Applied'),
-        ('pending', 'Application Pending'),
-        ('approved', 'Approved'),
-        ('rejected', 'Rejected')
-    ]
-    
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    phone_number = models.CharField(max_length=15, null=True, blank=True)
+    is_driver = models.BooleanField(default=False)
+    has_valid_license = models.BooleanField(default=False)
+    car_model = models.CharField(max_length=100, null=True, blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', default='', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    # Driver application fields
     driver_status = models.CharField(
         max_length=20,
-        choices=DRIVER_STATUS_CHOICES,
+        choices=[
+            ('not_applied', 'Not Applied'),
+            ('pending', 'Pending'),
+            ('approved', 'Approved'),
+            ('rejected', 'Rejected')
+        ],
         default='not_applied'
     )
-    driver_document = models.FileField(
-        upload_to='driver_docs/',
-        null=True,
-        blank=True,
-        verbose_name='Driver Documentation'
-    )
+    license_file = models.FileField(upload_to='licenses/', null=True, blank=True)
     application_date = models.DateTimeField(null=True, blank=True)
-    approval_date = models.DateTimeField(null=True, blank=True)
-    rejection_reason = models.TextField(null=True, blank=True)
-    bio = models.CharField(max_length=250, blank=True, null=True, help_text="Tell us about yourself (optional, max 250 characters)")
-
-    def is_driver(self):
-        return self.driver_status == 'approved'
+    admin_notes = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
-
-    phone_number = models.CharField(max_length=15, blank=True, null=True)
-    is_driver = models.BooleanField(default=False)
-    has_valid_license = models.BooleanField(default=False)
-    car_model = models.CharField(max_length=100, blank=True, null=True)
-    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(auto_now=True)
-    driver_status = models.CharField(
-        max_length=20,
-        choices=DRIVER_STATUS_CHOICES,
-        default='not_applied'
-    )
-    license_file = models.FileField(upload_to='licenses/', blank=True, null=True)
-    application_date = models.DateTimeField(null=True, blank=True)
-    admin_notes = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return self.user.username
-
-    class Meta:
-        ordering = ['-created_at']
 
 class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
