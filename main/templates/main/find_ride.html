@@ -32,7 +32,7 @@
                                 <div class="small text-muted">
                                     <p>Is driver: {{ user.userprofile.is_driver }}</p>
                                     <p>Driver status: {{ user.userprofile.driver_status }}</p>
-                                    <p>Is poster: {{ user == ride.user }}</p>
+                                    <p>Is poster: {% if ride.user.id == user.id %}Yes{% else %}No{% endif %}</p>
                                 </div>
                                 {% endif %}
                             </div>
@@ -40,7 +40,7 @@
                             <!-- Simplified condition for testing -->
                             {% if user.userprofile.is_driver %}
                                 {% if user.userprofile.driver_status == 'approved' %}
-                                    {% if user != ride.user %}
+                                    {% if ride.user.id != user.id %}
                                         <a href="{% url 'accept_ride' ride.id %}" 
                                            class="btn btn-success"
                                            onclick="return confirm('Are you sure you want to accept this ride?')">
@@ -53,7 +53,7 @@
                                     <span class="badge bg-warning">Approval Pending</span>
                                 {% endif %}
                             {% else %}
-                                {% if user == ride.user %}
+                                {% if ride.user.id == user.id %}
                                     <span class="badge bg-info">Your Ride</span>
                                 {% endif %}
                             {% endif %}
