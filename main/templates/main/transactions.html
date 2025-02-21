@@ -1,4 +1,5 @@
 ﻿{% extends 'main/base.html' %}
+{% load custom_filters %}
 
 {% block content %}
 <div class="container">
@@ -52,7 +53,7 @@
             <div class="d-flex w-100 justify-content-between">
                 <h5 class="mb-1">{{ transaction.pickup_location }} → {{ transaction.dropoff_location }}</h5>
                 <span class="text-{% if transaction.amount > 0 %}success{% else %}danger{% endif %} h5">
-                    £{{ transaction.amount|abs }}
+                    £{{ transaction.amount|absolute }}
                 </span>
             </div>
             <p class="mb-1">{{ transaction.description }}</p>

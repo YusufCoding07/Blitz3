@@ -1,6 +1,7 @@
 {% extends 'main/base.html' %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% load custom_filters %}
 
 {% block content %}
 <div class="container">
@@ -85,7 +86,7 @@
                             <div class="d-flex w-100 justify-content-between">
                                 <h6 class="mb-1">{{ transaction.pickup_location }} → {{ transaction.dropoff_location }}</h6>
                                 <small class="text-{% if transaction.amount > 0 %}success{% else %}danger{% endif %}">
-                                    £{{ transaction.amount|abs }}
+                                    £{{ transaction.amount|absolute }}
                                     {% if transaction.amount > 0 %}
                                         (Earned)
                                     {% else %}
