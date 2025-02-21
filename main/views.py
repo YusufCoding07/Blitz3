@@ -39,30 +39,29 @@ def home(request):
 # Profile Page
 @login_required
 def profile(request):
-    transaction_type = request.GET.get('transaction_type', 'all')
-    
-    # Base query
+    # Get all transactions for this user
     transactions = Transaction.objects.filter(user=request.user)
     
     # Calculate statistics
     earnings = transactions.filter(amount__gt=0)
     spendings = transactions.filter(amount__lt=0)
     
+    # Calculate totals (handle None cases)
+    total_earnings = earnings.aggregate(Sum('amount'))['amount__sum'] or 0
+    total_spendings = spendings.aggregate(Sum('amount'))['amount__sum'] or 0
+    
+    # Calculate averages (handle None cases)
+    avg_earnings = earnings.aggregate(Avg('amount'))['amount__avg'] or 0
+    avg_spendings = spendings.aggregate(Avg('amount'))['amount__avg'] or 0
+    
     stats = {
-        'total_earnings': earnings.aggregate(Sum('amount'))['amount__sum'] or 0,
-        'total_spendings': abs(spendings.aggregate(Sum('amount'))['amount__sum'] or 0),
-        'avg_earnings': earnings.aggregate(Avg('amount'))['amount__avg'] or 0,
-        'avg_spendings': abs(spendings.aggregate(Avg('amount'))['amount__avg'] or 0),
+        'total_earnings': abs(total_earnings),
+        'total_spendings': abs(total_spendings),
+        'avg_earnings': abs(avg_earnings),
+        'avg_spendings': abs(avg_spendings),
+        'has_earnings': earnings.exists(),
+        'has_spendings': spendings.exists(),
     }
-    
-    # Apply filters based on transaction type
-    if transaction_type == 'earnings':
-        transactions = earnings
-    elif transaction_type == 'spendings':
-        transactions = spendings
-    
-    # Order by most recent
-    transactions = transactions.order_by('-created_at')
 
     if request.method == 'POST':
         form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.userprofile)
@@ -76,9 +75,8 @@ def profile(request):
     return render(request, 'main/profile.html', {
         'form': form,
         'user': request.user,
-        'transactions': transactions,
-        'transaction_type': transaction_type,
-        'stats': stats
+        'transactions': transactions.order_by('-created_at')[:5],  # Show only last 5 transactions
+        'stats': stats,
     })
 
 # Map Page

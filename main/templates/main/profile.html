@@ -53,7 +53,36 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Balance Summary</h5>
-                    <!-- Add your balance summary here -->
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body py-2">
+                                    <h6 class="card-title mb-1">Earnings</h6>
+                                    {% if stats.has_earnings %}
+                                        <p class="mb-1 small">Total: £{{ stats.total_earnings|floatformat:2 }}</p>
+                                        <p class="mb-0 small">Average: £{{ stats.avg_earnings|floatformat:2 }}</p>
+                                    {% else %}
+                                        <p class="mb-1 small">Total: £0.00</p>
+                                        <p class="mb-0 small">Average: £0.00</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="card bg-danger text-white">
+                                <div class="card-body py-2">
+                                    <h6 class="card-title mb-1">Spendings</h6>
+                                    {% if stats.has_spendings %}
+                                        <p class="mb-1 small">Total: £{{ stats.total_spendings|floatformat:2 }}</p>
+                                        <p class="mb-0 small">Average: £{{ stats.avg_spendings|floatformat:2 }}</p>
+                                    {% else %}
+                                        <p class="mb-1 small">Total: £0.00</p>
+                                        <p class="mb-0 small">Average: £0.00</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
