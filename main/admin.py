@@ -1,9 +1,8 @@
 from django.contrib import admin
 from .models import UserProfile, Transaction
 
-@admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'phone_number', 'is_driver', 'driver_status')
+    list_display = ('user', 'phone_number', 'is_driver', 'has_valid_license', 'driver_status')
     list_filter = ('is_driver', 'driver_status')
     search_fields = ('user__username', 'phone_number')
     readonly_fields = ('created_at', 'updated_at')
@@ -42,9 +41,11 @@ class UserProfileAdmin(admin.ModelAdmin):
         )
     reject_driver.short_description = "Reject selected driver applications"
 
-@admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ('user', 'driver', 'pickup_location', 'dropoff_location', 'amount', 'status', 'created_at')
+    list_display = ('id', 'user', 'pickup_location', 'dropoff_location', 'amount', 'status', 'created_at')
     list_filter = ('status', 'created_at')
-    search_fields = ('user__username', 'driver__username', 'pickup_location', 'dropoff_location')
-    readonly_fields = ('created_at', 'updated_at')
+    search_fields = ('user__username', 'pickup_location', 'dropoff_location')
+    ordering = ('-created_at',)
+
+admin.site.register(UserProfile, UserProfileAdmin)
+admin.site.register(Transaction, TransactionAdmin)
