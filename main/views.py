@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Transaction, UserProfile, Ride
-from .forms import UserProfileForm, DriverApplicationForm, UserRegistrationForm, RideCreateForm, RideSearchForm
+from .forms import UserProfileForm, DriverApplicationForm, UserRegistrationForm, RideCreateForm, RideSearchForm, SignUpForm
 import logging
 import traceback
 from django.utils import timezone
@@ -19,39 +19,21 @@ logger = logging.getLogger('django')
 
 # Home Page (Find Ride)
 def home(request):
-    try:
-        context = {}
-        if request.user.is_authenticated:
-            logger.info(f"Authenticated user: {request.user.username}")
-            try:
-                # Change from UserProfile.objects.get() to a more defensive approach
-                profile, created = UserProfile.objects.get_or_create(
-                    user=request.user,
-                    defaults={
-                        'phone_number': '',
-                        'is_driver': False,
-                        'has_valid_license': False,
-                        'car_model': ''
-                    }
-                )
-                logger.info(f"Profile {'created' if created else 'found'} for user: {profile}")
-                context['profile'] = profile
-            except Exception as e:
-                logger.error(f"Error with profile: {str(e)}\n{traceback.format_exc()}")
-                context['profile_error'] = str(e)
-            
-            try:
-                transactions = Transaction.objects.filter(user=request.user).order_by('-created_at')[:5]
-                logger.info(f"Found {len(transactions)} transactions")
-                context['transactions'] = transactions
-            except Exception as e:
-                logger.error(f"Error getting transactions: {str(e)}\n{traceback.format_exc()}")
-                context['transaction_error'] = str(e)
-                
-        return render(request, 'main/home.html', context)
-    except Exception as e:
-        logger.error(f"Error in home view: {str(e)}\n{traceback.format_exc()}")
-        return render(request, 'main/error.html', {'error': str(e)})
+    nearby_rides = []
+    
+    if request.user.is_authenticated:
+        user_location = request.user.userprofile.location
+        # Get rides that match user's location or nearby areas
+        nearby_rides = Transaction.objects.filter(
+            Q(status='pending') &
+            (Q(pickup_location__icontains=user_location) |
+             Q(dropoff_location__icontains=user_location))
+        ).order_by('-created_at')[:5]  # Show 5 most recent nearby rides
+    
+    context = {
+        'nearby_rides': nearby_rides
+    }
+    return render(request, 'main/home.html', context)
 
 # Profile Page
 @login_required

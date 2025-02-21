@@ -66,4 +66,62 @@
         {% endfor %}
     </div>
 </div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <h1 class="text-center mb-4">Welcome to Blitz</h1>
+            
+            {% if user.is_authenticated %}
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Your Location: {{ user.userprofile.location }}</h5>
+                    </div>
+                </div>
+
+                {% if nearby_rides %}
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Nearby Rides</h5>
+                        </div>
+                        <div class="list-group list-group-flush">
+                            {% for ride in nearby_rides %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{{ ride.pickup_location }} → {{ ride.dropoff_location }}</h6>
+                                        <p class="mb-1">Price: £{{ ride.amount }}</p>
+                                        <small class="text-muted">Posted by: {{ ride.user.username }}</small>
+                                    </div>
+                                    {% if user != ride.user %}
+                                        <a href="{% url 'accept_ride' ride.id %}" 
+                                           class="btn btn-success btn-sm"
+                                           onclick="return confirm('Are you sure you want to accept this ride?')">
+                                            Accept
+                                        </a>
+                                    {% else %}
+                                        <span class="badge bg-info">Your Ride</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        No nearby rides available at the moment.
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="text-center">
+                    <p class="lead">Sign up or log in to see rides near you!</p>
+                    <div class="mt-4">
+                        <a href="{% url 'signup' %}" class="btn btn-primary me-2">Sign Up</a>
+                        <a href="{% url 'login' %}" class="btn btn-outline-primary">Log In</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -8,6 +8,7 @@ from decimal import Decimal
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    location = models.CharField(max_length=200, blank=True, default='')
     phone_number = models.CharField(max_length=15, null=True, blank=True)
     is_driver = models.BooleanField(default=False)
     has_valid_license = models.BooleanField(default=False)
