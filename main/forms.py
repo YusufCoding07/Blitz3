@@ -5,20 +5,34 @@ from django.contrib.auth.models import User
 from .models import UserProfile, Transaction
 
 class SignUpForm(UserCreationForm):
-    username = forms.CharField(max_length=150)
-    email = forms.EmailField(max_length=254, required=True, help_text='Required. Enter a valid email address.')
+    email = forms.EmailField(
+        max_length=254,
+        required=True,
+        help_text='Required. Enter a valid email address.',
+        widget=forms.EmailInput(attrs={'class': 'form-control'})
+    )
     location = forms.CharField(
         max_length=200,
         required=True,
-        widget=forms.TextInput(attrs={'placeholder': 'Enter your city or area'}),
-        help_text='Your current city or area'
+        help_text='Enter your current city or area',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., London'})
     )
+    username = forms.CharField(max_length=150)
     password1 = forms.CharField(widget=forms.PasswordInput)
     password2 = forms.CharField(widget=forms.PasswordInput)
 
     class Meta:
         model = User
         fields = ('username', 'email', 'location', 'password1', 'password2')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({'class': 'form-control'})
+        self.fields['password1'].widget.attrs.update({'class': 'form-control'})
+        self.fields['password2'].widget.attrs.update({'class': 'form-control'})
+        
+        # Update field order to show location after email
+        self.order_fields(['username', 'email', 'location', 'password1', 'password2'])
 
     def save(self, commit=True):
         user = super().save(commit=False)
