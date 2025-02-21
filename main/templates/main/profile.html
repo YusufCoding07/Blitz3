@@ -24,7 +24,7 @@
                     </button>
                     
                     {% if not user.userprofile.is_driver %}
-                    <a href="{% url 'become_driver' %}" class="btn btn-success mt-2">Become a Driver</a>
+                    <a href="{% url 'driver_application' %}" class="btn btn-success mt-2">Become a Driver</a>
                     {% else %}
                     <p class="mt-2">
                         Driver Status: 
