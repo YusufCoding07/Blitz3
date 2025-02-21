@@ -111,38 +111,40 @@ def logout_view(request):
 
 @login_required
 def find_ride(request):
-    # Get filter parameters from request
-    pickup = request.GET.get('pickup', '')
-    dropoff = request.GET.get('dropoff', '')
-    sort = request.GET.get('sort', '-created_at')
-    
-    # Base queryset
+    # Initialize form
+    form = RideSearchForm()
     rides = Transaction.objects.filter(status='pending')
     
-    # Apply filters if provided
-    if pickup:
-        rides = rides.filter(pickup_location__icontains=pickup)
-    if dropoff:
-        rides = rides.filter(dropoff_location__icontains=dropoff)
+    # Process form data if submitted
+    if request.GET:
+        form = RideSearchForm(request.GET)
+        if form.is_valid():
+            pickup = form.cleaned_data.get('pickup')
+            dropoff = form.cleaned_data.get('dropoff')
+            
+            if pickup:
+                rides = rides.filter(pickup_location__icontains=pickup)
+            if dropoff:
+                rides = rides.filter(dropoff_location__icontains=dropoff)
     
-    # Apply sorting
+    # Handle sorting
+    sort = request.GET.get('sort', '-created_at')
     if sort == 'price_low':
         rides = rides.order_by('amount')
     elif sort == 'price_high':
         rides = rides.order_by('-amount')
     else:
         rides = rides.order_by('-created_at')
-    
-    context = {
+
+    return render(request, 'main/find_ride.html', {
+        'form': form,
         'rides': rides,
         'current_filters': {
-            'pickup': pickup,
-            'dropoff': dropoff,
+            'pickup': request.GET.get('pickup', ''),
+            'dropoff': request.GET.get('dropoff', ''),
             'sort': sort
         }
-    }
-    
-    return render(request, 'main/find_ride.html', context)
+    })
 
 from django.core.exceptions import ObjectDoesNotExist
 

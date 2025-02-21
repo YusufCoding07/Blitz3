@@ -1,106 +1,37 @@
 {% extends 'main/base.html' %}
-{% load static %}
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="hero-section">
-    <div class="container text-center">
-        <h1 class="display-4 mb-4">Find Your Ride</h1>
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h4 class="card-title">Find a Ride</h4>
-                        <form method="get">
-                            {% crispy form %}
-                            <button type="submit" class="btn btn-primary mt-3">Search Rides</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Add error handling for form -->
-{% if form.errors %}
-<div class="alert alert-danger">
-    Please correct the errors below.
-</div>
-{% endif %}
-
-<div class="container my-5">
-    <h2 class="mb-4">Available Rides</h2>
-
-    <!-- Filter Section -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="get" class="row g-3">
-                <div class="col-md-4">
-                    <input type="text" class="form-control" name="pickup" 
-                           placeholder="Pickup Location" value="{{ current_filters.pickup }}">
-                </div>
-                <div class="col-md-4">
-                    <input type="text" class="form-control" name="dropoff" 
-                           placeholder="Dropoff Location" value="{{ current_filters.dropoff }}">
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select" name="sort">
-                        <option value="-created_at" {% if current_filters.sort == '-created_at' %}selected{% endif %}>Newest First</option>
-                        <option value="price_low" {% if current_filters.sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
-                        <option value="price_high" {% if current_filters.sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
-                    </select>
-                </div>
-                <div class="col-md-1">
-                    <button type="submit" class="btn btn-primary w-100">Filter</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Ride Listings -->
-    <div class="row g-4">
-        {% for ride in rides %}
-        <div class="col-md-6 col-lg-4">
-            <div class="card h-100">
+<div class="container">
+    <h1 class="mb-4">Find Your Ride</h1>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">₦{{ ride.amount }}</h5>
-                    <p class="card-text">
-                        <strong>From:</strong> {{ ride.pickup_location }}<br>
-                        <strong>To:</strong> {{ ride.dropoff_location }}<br>
-                        <strong>Posted:</strong> {{ ride.created_at|timesince }} ago
-                    </p>
-                    {% if user.userprofile.is_driver and user.userprofile.driver_status == 'approved' %}
-                        <form method="post" action="{% url 'accept_ride' ride.id %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-success">Accept Ride</button>
-                        </form>
-                    {% endif %}
+                    <form method="get">
+                        {{ form|crispy }}
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </form>
                 </div>
             </div>
-        </div>
-        {% empty %}
-        <div class="col-12">
-            <div class="alert alert-info">
-                No rides available matching your criteria.
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-
-    <!-- Map Section -->
-    <div class="card mt-5">
-        <div class="card-body">
-            <h5 class="card-title mb-3">
-                <i class="fa-solid fa-map-location-dot me-2"></i>
-                Ride Coverage Area
-            </h5>
-            <div class="ratio ratio-16x9">
-                <!-- Placeholder for map integration -->
-                <div class="bg-light d-flex align-items-center justify-content-center">
-                    <i class="fa-solid fa-map fa-3x text-muted"></i>
+            
+            {% if rides %}
+            <div class="mt-4">
+                <h2>Available Rides</h2>
+                <div class="list-group">
+                    {% for ride in rides %}
+                    <div class="list-group-item">
+                        <h5>{{ ride.pickup_location }} → {{ ride.dropoff_location }}</h5>
+                        <p>Price: £{{ ride.amount }}</p>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
+            {% else %}
+            <div class="mt-4 alert alert-info">
+                No rides found matching your criteria.
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>
