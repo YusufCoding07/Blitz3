@@ -3,8 +3,13 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.utils import timezone
+from django.db.models import Q, Sum, Avg
+from django.db import transaction, IntegrityError
+from decimal import Decimal
+from datetime import datetime
+
 from .models import Transaction, UserProfile, Ride
 from .forms import (
     UserRegisterForm,
@@ -15,17 +20,11 @@ from .forms import (
     SignUpForm,
     ProfileUpdateForm
 )
-import logging
-import traceback
-from django.utils import timezone
-from django.db.models import Q, Sum, Avg
-from django import forms
-from django.db import transaction, IntegrityError
-from decimal import Decimal
-from datetime import datetime
 
+import logging
 logger = logging.getLogger('django')
 
+# Then copy all your view functions here 
 # Home Page (Find Ride)
 def home(request):
     context = {}
@@ -54,7 +53,6 @@ def home(request):
         })
     
     return render(request, 'main/home.html', context)
-
 # Profile Page
 @login_required
 def profile(request):
@@ -144,7 +142,6 @@ def transactions(request):
         'has_earnings': earnings.exists(),
         'has_spendings': spendings.exists(),
     })
-
 def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
