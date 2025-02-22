@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger('django')
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -7,10 +10,6 @@ from .models import Ride
 from .forms import RideCreateForm
 from .models import Transaction
 from django.contrib.auth import logout
-
-
-import logging
-logger = logging.getLogger('django')
 # Then copy all your view functions here 
 # Home Page (Find Ride)
 def home(request):
