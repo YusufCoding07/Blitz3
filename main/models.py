@@ -6,9 +6,10 @@ from cloudinary.models import CloudinaryField
 from django.utils import timezone
 from decimal import Decimal
 from django.db.models import Q
+from django.conf import settings
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     location = models.CharField(max_length=200, blank=True, default='')
     bio = models.TextField(max_length=500, blank=True, default='')
     phone_number = models.CharField(max_length=15, null=True, blank=True)
@@ -50,8 +51,8 @@ class Transaction(models.Model):
         ('cancelled', 'Cancelled'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    driver = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='driven_transactions')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    driver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='driven_transactions')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     transaction_type = models.CharField(max_length=20, choices=TRANSACTION_TYPES, default='ride')
@@ -89,7 +90,8 @@ class Ride(models.Model):
         ('cancelled', 'Cancelled')
     ]
 
-    driver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='rides_offered')
+    driver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='rides_as_driver')
+    passenger = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='rides_as_passenger')
     pickup_location = models.CharField(max_length=255)
     dropoff_location = models.CharField(max_length=255)
     date = models.DateField()
