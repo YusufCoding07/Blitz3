@@ -1,51 +1,21 @@
 from django.contrib import admin
-from .models import UserProfile, Transaction
+from .models import UserProfile, Transaction, Ride
 
+@admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'phone_number', 'is_driver', 'has_valid_license', 'driver_status')
-    list_filter = ('is_driver', 'driver_status')
-    search_fields = ('user__username', 'phone_number')
-    readonly_fields = ('created_at', 'updated_at')
-    
-    fieldsets = (
-        ('User Information', {
-            'fields': ('user', 'phone_number', 'profile_picture')
-        }),
-        ('Driver Status', {
-            'fields': ('is_driver', 'driver_status', 'has_valid_license', 'car_model')
-        }),
-        ('Application Details', {
-            'fields': ('license_file', 'application_date', 'admin_notes')
-        }),
-        ('Timestamps', {
-            'fields': ('created_at', 'updated_at'),
-            'classes': ('collapse',)
-        })
-    )
+    list_display = ['user', 'is_driver', 'driver_status', 'car_model']
+    list_filter = ['is_driver', 'driver_status']
+    search_fields = ['user__username', 'car_model', 'license_number']
+    readonly_fields = ['user']
 
-    actions = ['approve_driver', 'reject_driver']
-
-    def approve_driver(self, request, queryset):
-        queryset.update(
-            is_driver=True,
-            driver_status='approved',
-            has_valid_license=True
-        )
-    approve_driver.short_description = "Approve selected driver applications"
-
-    def reject_driver(self, request, queryset):
-        queryset.update(
-            is_driver=False,
-            driver_status='rejected',
-            has_valid_license=False
-        )
-    reject_driver.short_description = "Reject selected driver applications"
-
+@admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'pickup_location', 'dropoff_location', 'amount', 'status', 'created_at')
-    list_filter = ('status', 'created_at')
-    search_fields = ('user__username', 'pickup_location', 'dropoff_location')
-    ordering = ('-created_at',)
+    list_display = ['user', 'amount', 'timestamp', 'description']
+    list_filter = ['timestamp']
+    search_fields = ['user__username', 'description']
 
-admin.site.register(UserProfile, UserProfileAdmin)
-admin.site.register(Transaction, TransactionAdmin)
+@admin.register(Ride)
+class RideAdmin(admin.ModelAdmin):
+    list_display = ['pickup_location', 'dropoff_location', 'date', 'time', 'price', 'status']
+    list_filter = ['status', 'date']
+    search_fields = ['pickup_location', 'dropoff_location', 'driver__username', 'passenger__username']
