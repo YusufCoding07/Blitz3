@@ -64,9 +64,13 @@ class UserProfileForm(forms.ModelForm):
             field.required = False
 
 class DriverApplicationForm(forms.ModelForm):
+    car_model = forms.CharField(max_length=100)
+    car_year = forms.IntegerField()
+    license_number = forms.CharField(max_length=50)
+    
     class Meta:
         model = UserProfile
-        fields = ['is_driver']
+        fields = ['is_driver', 'car_model', 'car_year', 'license_number']
 
 class ProfileUpdateForm(forms.ModelForm):
     profile_picture = forms.ImageField(

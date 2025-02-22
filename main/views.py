@@ -236,21 +236,19 @@ def update_profile(request):
 
 @login_required
 def driver_application(request):
+    user_profile = UserProfile.objects.get(user=request.user)
+    
     if request.method == 'POST':
-        form = DriverApplicationForm(request.POST, request.FILES)
+        form = DriverApplicationForm(request.POST, instance=user_profile)
         if form.is_valid():
-            profile = request.user.userprofile
-            profile.car_model = form.cleaned_data['car_model']
-            profile.license_file = form.cleaned_data['license_file']
+            profile = form.save(commit=False)
+            profile.is_driver = True
             profile.driver_status = 'pending'
-            profile.is_driver = True  # Set this flag when they apply
-            profile.application_date = timezone.now()
             profile.save()
-            
-            messages.success(request, 'Your driver application has been submitted successfully!')
+            messages.success(request, 'Your driver application has been submitted!')
             return redirect('profile')
     else:
-        form = DriverApplicationForm()
+        form = DriverApplicationForm(instance=user_profile)
     
     return render(request, 'main/driver_application.html', {'form': form})
 
