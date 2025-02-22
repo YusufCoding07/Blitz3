@@ -20,7 +20,7 @@ import traceback
 from django.utils import timezone
 from django.db.models import Q, Sum, Avg
 from django import forms
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from decimal import Decimal
 from datetime import datetime
 
@@ -142,17 +142,26 @@ def register(request):
         if form.is_valid() and profile_form.is_valid():
             try:
                 with transaction.atomic():
+                    # Create the user first
                     user = form.save()
-                    profile = profile_form.save(commit=False)
-                    profile.user = user
-                    profile.save()
+                    
+                    # Check if profile already exists
+                    if not UserProfile.objects.filter(user=user).exists():
+                        # Create the profile
+                        profile = profile_form.save(commit=False)
+                        profile.user = user
+                        profile.save()
                     
                     username = form.cleaned_data.get('username')
                     messages.success(request, f'Account created for {username}!')
                     return redirect('login')
+                    
+            except IntegrityError as e:
+                messages.error(request, f'Database error: {str(e)}')
+                if 'user' in locals():
+                    user.delete()
             except Exception as e:
-                messages.error(request, 'An error occurred while creating your account. Please try again.')
-                # If there was an error, delete the user if it was created
+                messages.error(request, f'Unexpected error: {str(e)}')
                 if 'user' in locals():
                     user.delete()
     else:
