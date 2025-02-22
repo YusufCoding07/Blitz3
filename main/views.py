@@ -28,20 +28,31 @@ logger = logging.getLogger('django')
 
 # Home Page (Find Ride)
 def home(request):
-    nearby_rides = []
+    context = {}
     
     if request.user.is_authenticated:
-        user_location = request.user.userprofile.location
-        # Get rides that match user's location or nearby areas
-        nearby_rides = Transaction.objects.filter(
-            Q(status='pending') &
-            (Q(pickup_location__icontains=user_location) |
-             Q(dropoff_location__icontains=user_location))
-        ).order_by('-created_at')[:5]  # Show 5 most recent nearby rides
+        # Get nearby rides from the Ride model, not Transaction
+        nearby_rides = Ride.objects.filter(
+            status='available'
+        ).exclude(
+            driver=request.user
+        ).order_by('-created_at')[:5]
+        
+        # Get user's rides
+        if hasattr(request.user, 'userprofile') and request.user.userprofile.is_driver:
+            user_rides = Ride.objects.filter(
+                driver=request.user
+            ).order_by('-created_at')[:5]
+        else:
+            user_rides = Ride.objects.filter(
+                passenger=request.user
+            ).order_by('-created_at')[:5]
+        
+        context.update({
+            'nearby_rides': nearby_rides,
+            'user_rides': user_rides,
+        })
     
-    context = {
-        'nearby_rides': nearby_rides
-    }
     return render(request, 'main/home.html', context)
 
 # Profile Page
