@@ -18,7 +18,7 @@ class User(AbstractUser):
 
 class UserProfile(models.Model):
     user = models.OneToOneField('main.User', on_delete=models.CASCADE)
-    location = models.CharField(max_length=100, blank=True)
+    location = models.CharField(max_length=200, blank=True)
     bio = models.TextField(max_length=500, blank=True)
     phone_number = models.CharField(max_length=15, null=True, blank=True)
     is_driver = models.BooleanField(default=False)
@@ -26,7 +26,7 @@ class UserProfile(models.Model):
     car_model = models.CharField(max_length=100, blank=True)
     car_year = models.IntegerField(null=True, blank=True)
     license_number = models.CharField(max_length=50, blank=True)
-    profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pics', default='default.jpg')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -45,7 +45,7 @@ class UserProfile(models.Model):
     admin_notes = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.user.username}'s profile"
+        return f'{self.user.username} Profile'
 
 class Transaction(models.Model):
     TRANSACTION_TYPES = [
