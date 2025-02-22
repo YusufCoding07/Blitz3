@@ -152,7 +152,7 @@ def register(request):
         form = UserRegisterForm()
         profile_form = UserProfileForm()
     
-    return render(request, 'main/register.html', {
+    return render(request, 'registration/signup.html', {
         'form': form,
         'profile_form': profile_form
     })
