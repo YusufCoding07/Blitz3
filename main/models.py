@@ -35,35 +35,13 @@ class UserProfile(models.Model):
         return f'{self.user.username} Profile'
 
 class Transaction(models.Model):
-    TRANSACTION_TYPES = [
-        ('ride', 'Ride Posting'),
-        ('payment', 'Payment'),
-        ('earning', 'Earning'),
-    ]
-    
-    STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('accepted', 'Accepted'),
-        ('completed', 'Completed'),
-        ('cancelled', 'Cancelled'),
-    ]
-
-    user = models.ForeignKey('main.User', on_delete=models.CASCADE)
-    driver = models.ForeignKey('main.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='driven_transactions')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    transaction_type = models.CharField(max_length=20, choices=TRANSACTION_TYPES, default='ride')
-    pickup_location = models.CharField(max_length=200)
-    dropoff_location = models.CharField(max_length=200)
-    description = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['-created_at']
-
+    created_at = models.DateTimeField(default=timezone.now)
+    description = models.CharField(max_length=200)
+    
     def __str__(self):
-        return f"{self.user.username}'s {self.transaction_type} - {self.amount}"
+        return f"{self.user.username} - {self.amount} - {self.created_at}"
 
 @receiver(post_save, sender='main.User')
 def create_user_profile(sender, instance, created, **kwargs):

@@ -10,8 +10,8 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ['user', 'amount', 'timestamp', 'description']
-    list_filter = ['timestamp']
+    list_display = ['user', 'amount', 'created_at', 'description']
+    list_filter = ['created_at']
     search_fields = ['user__username', 'description']
 
 @admin.register(Ride)
