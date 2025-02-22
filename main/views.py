@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm  # Use Django's built-in form temporarily
 
+from .models import Ride
 import logging
 logger = logging.getLogger('django')
 # Then copy all your view functions here 
