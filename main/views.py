@@ -36,7 +36,7 @@ def home(request):
             status='available'
         ).exclude(
             driver=request.user
-        ).order_by('-created_at')[:5]
+        ).order_by('-date', '-time')[:5]
         
         # Get user's rides
         if hasattr(request.user, 'userprofile') and request.user.userprofile.is_driver:
@@ -221,13 +221,13 @@ def find_ride(request):
                 rides = rides.filter(dropoff_location__icontains=dropoff)
     
     # Handle sorting
-    sort = request.GET.get('sort', '-created_at')
+    sort = request.GET.get('sort', '-date')
     if sort == 'price_low':
         rides = rides.order_by('amount')
     elif sort == 'price_high':
         rides = rides.order_by('-amount')
     else:
-        rides = rides.order_by('-created_at')
+        rides = rides.order_by('-date', '-time')
 
     return render(request, 'main/find_ride.html', {
         'form': form,
@@ -376,7 +376,7 @@ def search_rides(request):
                 status='pending',
                 pickup_location__icontains=pickup,
                 dropoff_location__icontains=dropoff
-            ).order_by('-created_at')
+            ).order_by('-date', '-time')
             return render(request, 'main/search_results.html', {'rides': rides})
     else:
         form = RideSearchForm()
