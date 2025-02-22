@@ -1,7 +1,7 @@
 ﻿# main/forms.py
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import User, UserProfile
+from .models import User, UserProfile, Ride, Transaction
 
 class SignUpForm(UserCreationForm):
     username = forms.CharField(
@@ -50,7 +50,7 @@ class UserRegisterForm(UserCreationForm):
     email = forms.EmailField()
     
     class Meta:
-        model = User  # Use our custom User model
+        model = User
         fields = ['username', 'email', 'password1', 'password2']
 
 class UserProfileForm(forms.ModelForm):
@@ -66,16 +66,7 @@ class UserProfileForm(forms.ModelForm):
 class DriverApplicationForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['license_file', 'car_model']
-        widgets = {
-            'license_file': forms.FileInput(attrs={'class': 'form-control'})
-        }
-
-    def clean_phone_number(self):
-        phone = self.cleaned_data.get('phone_number')
-        if not phone:
-            raise forms.ValidationError("Phone number is required for drivers")
-        return phone
+        fields = ['is_driver']
 
 class ProfileUpdateForm(forms.ModelForm):
     profile_picture = forms.ImageField(
@@ -105,16 +96,18 @@ class ProfileUpdateForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
-        fields = ['profile_picture', 'location', 'bio']
+        fields = ['bio', 'location', 'profile_picture']
 
 class RideCreateForm(forms.ModelForm):
     class Meta:
-        model = Transaction
-        fields = ['pickup_location', 'dropoff_location', 'amount']
+        model = Ride
+        fields = ['pickup_location', 'dropoff_location', 'date', 'time', 'price', 'seats_available', 'description']
         widgets = {
-            'amount': forms.NumberInput(attrs={'step': '0.01'})
+            'date': forms.DateInput(attrs={'type': 'date'}),
+            'time': forms.TimeInput(attrs={'type': 'time'}),
         }
 
 class RideSearchForm(forms.Form):
-    pickup_location = forms.CharField(max_length=200)
-    dropoff_location = forms.CharField(max_length=200)
+    pickup_location = forms.CharField(max_length=200, required=False)
+    dropoff_location = forms.CharField(max_length=200, required=False)
+    date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
