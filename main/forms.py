@@ -105,7 +105,15 @@ class ProfileUpdateForm(forms.ModelForm):
 class RideCreateForm(forms.ModelForm):
     class Meta:
         model = Ride
-        fields = ['pickup_location', 'dropoff_location', 'date', 'time', 'price', 'seats_available', 'description']
+        fields = [
+            'pickup_location',
+            'dropoff_location',
+            'date',
+            'time',
+            'price',
+            'seats',
+            'notes',
+        ]
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
             'time': forms.TimeInput(attrs={'type': 'time'}),
