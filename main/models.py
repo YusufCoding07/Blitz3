@@ -1,4 +1,4 @@
-﻿from django.contrib.auth.models import User, AbstractUser
+﻿from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -8,15 +8,23 @@ from decimal import Decimal
 from django.db.models import Q
 from django.conf import settings
 
+class User(AbstractUser):
+    @property
+    def current_ride(self):
+        return Ride.objects.filter(
+            Q(driver=self) | Q(passenger=self),
+            status='accepted'
+        ).first()
+
 class UserProfile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    location = models.CharField(max_length=200, blank=True, default='')
-    bio = models.TextField(max_length=500, blank=True, default='')
+    user = models.OneToOneField('main.User', on_delete=models.CASCADE)
+    location = models.CharField(max_length=100, blank=True)
+    bio = models.TextField(max_length=500, blank=True)
     phone_number = models.CharField(max_length=15, null=True, blank=True)
     is_driver = models.BooleanField(default=False)
     has_valid_license = models.BooleanField(default=False)
     car_model = models.CharField(max_length=100, default='')
-    profile_picture = models.ImageField(upload_to='profile_pics/', default='', blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -51,8 +59,8 @@ class Transaction(models.Model):
         ('cancelled', 'Cancelled'),
     ]
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    driver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='driven_transactions')
+    user = models.ForeignKey('main.User', on_delete=models.CASCADE)
+    driver = models.ForeignKey('main.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='driven_transactions')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     transaction_type = models.CharField(max_length=20, choices=TRANSACTION_TYPES, default='ride')
@@ -68,12 +76,12 @@ class Transaction(models.Model):
     def __str__(self):
         return f"{self.user.username}'s {self.transaction_type} - {self.amount}"
 
-@receiver(post_save, sender=User)
+@receiver(post_save, sender='main.User')
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         UserProfile.objects.create(user=instance)
 
-@receiver(post_save, sender=User)
+@receiver(post_save, sender='main.User')
 def save_user_profile(sender, instance, **kwargs):
     try:
         if not hasattr(instance, 'userprofile'):
@@ -84,33 +92,26 @@ def save_user_profile(sender, instance, **kwargs):
 
 class Ride(models.Model):
     RIDE_STATUS_CHOICES = [
-        ('open', 'Open'),
-        ('booked', 'Booked'),
+        ('available', 'Available'),
+        ('accepted', 'Accepted'),
         ('completed', 'Completed'),
         ('cancelled', 'Cancelled')
     ]
 
-    driver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='rides_as_driver')
-    passenger = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='rides_as_passenger')
-    pickup_location = models.CharField(max_length=255)
-    dropoff_location = models.CharField(max_length=255)
+    driver = models.ForeignKey('main.User', on_delete=models.CASCADE, related_name='rides_as_driver')
+    passenger = models.ForeignKey('main.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='rides_as_passenger')
+    pickup_location = models.CharField(max_length=200)
+    dropoff_location = models.CharField(max_length=200)
     date = models.DateField()
     time = models.TimeField()
     price = models.DecimalField(max_digits=6, decimal_places=2)
     seats_available = models.IntegerField(default=1)
-    status = models.CharField(max_length=20, choices=RIDE_STATUS_CHOICES, default='open')
+    status = models.CharField(max_length=20, choices=RIDE_STATUS_CHOICES, default='available')
     created_at = models.DateTimeField(auto_now_add=True)
+    description = models.TextField(blank=True)
 
     class Meta:
         ordering = ['date', 'time']
 
     def __str__(self):
         return f"Ride from {self.pickup_location} to {self.dropoff_location} on {self.date}"
-
-class User(AbstractUser):
-    @property
-    def current_ride(self):
-        return Ride.objects.filter(
-            Q(driver=self) | Q(passenger=self),
-            status='accepted'
-        ).first()
