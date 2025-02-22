@@ -1,7 +1,13 @@
-# main/urls.py
-from django.urls import path
-from . import views
-
+from django.db.models import Sum, Avg  # Add this
+from django.contrib.auth.models import User  # Add this
+from .models import UserProfile  # Add this
+from .forms import (
+    ProfileUpdateForm,
+    UserRegisterForm,
+    UserProfileForm,
+    DriverApplicationForm,
+    SignUpForm
+)  # Add these
 urlpatterns = [
     path('', views.home, name='home'),
     path('register/', views.register, name='register'),
