@@ -2,8 +2,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm  # Use Django's built-in form temporarily
-
+from .forms import RideSearchForm  # Import the form
 from .models import Ride
+from .forms import RideCreateForm
+from .models import Transaction
+from django.contrib.auth import logout
+
 import logging
 logger = logging.getLogger('django')
 # Then copy all your view functions here 
