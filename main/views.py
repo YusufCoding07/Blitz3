@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Transaction, UserProfile, Ride
-from .forms import UserProfileForm, DriverApplicationForm, UserRegistrationForm, RideCreateForm, RideSearchForm, SignUpForm, ProfileUpdateForm
+from .forms import UserProfileForm, DriverApplicationForm, UserRegistrationForm, RideCreateForm, RideSearchForm, SignUpForm, ProfileUpdateForm, UserRegisterForm
 import logging
 import traceback
 from django.utils import timezone
@@ -128,14 +128,26 @@ def transactions(request):
 
 def register(request):
     if request.method == 'POST':
-        form = UserRegistrationForm(request.POST)
-        if form.is_valid():
+        form = UserRegisterForm(request.POST)
+        profile_form = UserProfileForm(request.POST, request.FILES)
+        
+        if form.is_valid() and profile_form.is_valid():
             user = form.save()
-            login(request, user)
-            return redirect('home')
+            profile = profile_form.save(commit=False)
+            profile.user = user
+            profile.save()
+            
+            username = form.cleaned_data.get('username')
+            messages.success(request, f'Account created for {username}!')
+            return redirect('login')
     else:
-        form = UserRegistrationForm()
-    return render(request, 'registration/signup.html', {'form': form})
+        form = UserRegisterForm()
+        profile_form = UserProfileForm()
+    
+    return render(request, 'main/register.html', {
+        'form': form,
+        'profile_form': profile_form
+    })
 
 # Login Page
 def login_view(request):

@@ -1,8 +1,7 @@
 ﻿# main/forms.py
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
-from .models import UserProfile, Transaction
+from .models import User, UserProfile
 
 class SignUpForm(UserCreationForm):
     username = forms.CharField(
@@ -47,23 +46,17 @@ class SignUpForm(UserCreationForm):
             )
         return user
 
-class UserRegistrationForm(UserCreationForm):
+class UserRegisterForm(UserCreationForm):
     email = forms.EmailField()
-
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if User.objects.filter(email=email).exists():
-            raise forms.ValidationError("Email already exists")
-        return email
-
+    
     class Meta:
-        model = User
+        model = User  # Use our custom User model
         fields = ['username', 'email', 'password1', 'password2']
 
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['phone_number', 'profile_picture']
+        fields = ['is_driver', 'bio', 'location', 'profile_picture']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
