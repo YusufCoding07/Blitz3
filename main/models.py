@@ -17,32 +17,19 @@ class User(AbstractUser):
         ).first()
 
 class UserProfile(models.Model):
-    user = models.OneToOneField('main.User', on_delete=models.CASCADE)
-    location = models.CharField(max_length=200, blank=True)
-    bio = models.TextField(max_length=500, blank=True)
-    phone_number = models.CharField(max_length=15, null=True, blank=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     is_driver = models.BooleanField(default=False)
-    has_valid_license = models.BooleanField(default=False)
+    bio = models.TextField(max_length=500, blank=True)
+    location = models.CharField(max_length=200, blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pics', default='default.jpg')
+    driver_status = models.CharField(max_length=20, choices=[
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected')
+    ], default='pending')
     car_model = models.CharField(max_length=100, blank=True)
     car_year = models.IntegerField(null=True, blank=True)
     license_number = models.CharField(max_length=50, blank=True)
-    profile_picture = models.ImageField(upload_to='profile_pics', default='default.jpg')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    # Driver application fields
-    driver_status = models.CharField(
-        max_length=20,
-        choices=[
-            ('pending', 'Pending'),
-            ('approved', 'Approved'),
-            ('rejected', 'Rejected')
-        ],
-        default='pending'
-    )
-    license_file = models.FileField(upload_to='driver_documents/', null=True, blank=True)
-    application_date = models.DateTimeField(null=True, blank=True)
-    admin_notes = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.user.username} Profile'
