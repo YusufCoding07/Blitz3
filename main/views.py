@@ -6,7 +6,15 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Transaction, UserProfile, Ride
-from .forms import UserProfileForm, DriverApplicationForm, UserRegistrationForm, RideCreateForm, RideSearchForm, SignUpForm, ProfileUpdateForm, UserRegisterForm
+from .forms import (
+    UserRegisterForm,
+    UserProfileForm,
+    DriverApplicationForm,
+    RideCreateForm,
+    RideSearchForm,
+    SignUpForm,
+    ProfileUpdateForm
+)
 import logging
 import traceback
 from django.utils import timezone
@@ -216,10 +224,6 @@ def update_profile(request):
         form = UserProfileForm(instance=request.user.userprofile)
     
     return render(request, 'main/update_profile.html', {'form': form})
-
-class DriverApplicationForm(forms.Form):
-    car_model = forms.CharField(max_length=100)
-    license_file = forms.FileField(label='Driver License')  # Changed from 'document' to 'license_file'
 
 @login_required
 def driver_application(request):
