@@ -23,11 +23,11 @@ def home(request):
         if hasattr(request.user, 'userprofile') and request.user.userprofile.is_driver:
             user_rides = Ride.objects.filter(
                 driver=request.user
-            ).order_by('-created_at')[:5]
+            ).order_by('-date')[:5]
         else:
             user_rides = Ride.objects.filter(
                 passenger=request.user
-            ).order_by('-created_at')[:5]
+            ).order_by('-date')[:5]
         
         context.update({
             'nearby_rides': nearby_rides,
