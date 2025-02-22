@@ -1,0 +1,103 @@
+{% extends 'main/base.html' %}
+
+{% block extra_head %}
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
+
+<!-- Leaflet Routing Machine CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+
+<style>
+    #map {
+        height: 500px;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    .journey-details {
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Current Journey</h2>
+            <div class="journey-details">
+                <p><strong>From:</strong> {{ ride.pickup_location }}</p>
+                <p><strong>To:</strong> {{ ride.dropoff_location }}</p>
+                <p><strong>Price:</strong> £{{ ride.price }}</p>
+                {% if user == ride.passenger %}
+                    <p><strong>Driver:</strong> {{ ride.driver.username }}</p>
+                {% else %}
+                    <p><strong>Passenger:</strong> {{ ride.passenger.username }}</p>
+                {% endif %}
+            </div>
+            <div id="map"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+
+<!-- Leaflet Routing Machine JS -->
+<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize the map
+    var map = L.map('map').setView([51.5074, -0.1278], 13); // Default to London
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Function to geocode addresses
+    async function geocodeAddress(address) {
+        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
+        const data = await response.json();
+        if (data.length > 0) {
+            return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+        }
+        return null;
+    }
+
+    // Initialize routing
+    async function initializeRoute() {
+        const pickup = await geocodeAddress('{{ ride.pickup_location }}');
+        const dropoff = await geocodeAddress('{{ ride.dropoff_location }}');
+
+        if (pickup && dropoff) {
+            // Add markers
+            L.marker(pickup).addTo(map).bindPopup('Pickup Location');
+            L.marker(dropoff).addTo(map).bindPopup('Dropoff Location');
+
+            // Create routing
+            L.Routing.control({
+                waypoints: [
+                    L.latLng(pickup[0], pickup[1]),
+                    L.latLng(dropoff[0], dropoff[1])
+                ],
+                routeWhileDragging: false,
+                addWaypoints: false,
+                draggableWaypoints: false
+            }).addTo(map);
+
+            // Fit bounds to show both markers
+            const bounds = L.latLngBounds([pickup, dropoff]);
+            map.fitBounds(bounds, { padding: [50, 50] });
+        }
+    }
+
+    initializeRoute();
+});
+</script>
+{% endblock %} 

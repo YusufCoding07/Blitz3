@@ -238,62 +238,40 @@ def request_ride(request):
 
 @login_required
 def accept_ride(request, ride_id):
-    try:
-        # First try to get the ride
-        ride = get_object_or_404(Transaction, id=ride_id)
-        
-        # Check if ride is still pending
-        if ride.status != 'pending':
-            messages.error(request, 'This ride is no longer available.')
-            return redirect('find_ride')
-        
-        # Don't allow accepting your own ride
-        if request.user == ride.user:
-            messages.error(request, 'You cannot accept your own ride.')
-            return redirect('find_ride')
-        
-        try:
-            with transaction.atomic():
-                # Update the ride status
-                ride.status = 'accepted'
-                ride.driver = request.user  # Add this line to track who accepted the ride
-                ride.save()
-                
-                # Create payment transaction for the passenger
-                passenger_transaction = Transaction.objects.create(
-                    user=ride.user,  # passenger
-                    amount=Decimal(str(-ride.amount)),  # Convert to Decimal explicitly
-                    status='completed',
-                    transaction_type='payment',  # Add transaction type
-                    pickup_location=ride.pickup_location,
-                    dropoff_location=ride.dropoff_location,
-                    description=f'Payment for ride from {ride.pickup_location} to {ride.dropoff_location}'
-                )
-                
-                # Create earning transaction for the accepting user
-                driver_transaction = Transaction.objects.create(
-                    user=request.user,  # accepting user
-                    amount=Decimal(str(ride.amount)),  # Convert to Decimal explicitly
-                    status='completed',
-                    transaction_type='earning',  # Add transaction type
-                    pickup_location=ride.pickup_location,
-                    dropoff_location=ride.dropoff_location,
-                    description=f'Earnings from ride {ride.pickup_location} to {ride.dropoff_location}'
-                )
-                
-                logger.info(f'Ride {ride_id} accepted successfully. Payment: {passenger_transaction.id}, Earning: {driver_transaction.id}')
-                messages.success(request, 'Ride accepted successfully!')
-                return redirect('transactions')
-                
-        except Exception as e:
-            logger.error(f'Error in transaction processing for ride {ride_id}: {str(e)}')
-            messages.error(request, f'Transaction error: {str(e)}')
-            return redirect('find_ride')
-            
-    except Exception as e:
-        logger.error(f'Error accepting ride {ride_id}: {str(e)}')
-        messages.error(request, f'Error accepting ride: {str(e)}')
+    ride = get_object_or_404(Ride, id=ride_id)
+    
+    if ride.status != 'available':
+        messages.error(request, 'This ride is no longer available.')
         return redirect('find_ride')
+    
+    if ride.driver == request.user:
+        messages.error(request, 'You cannot accept your own ride.')
+        return redirect('find_ride')
+    
+    ride.passenger = request.user
+    ride.status = 'accepted'
+    ride.save()
+    
+    # Create transaction for passenger (negative amount for spending)
+    Transaction.objects.create(
+        user=request.user,  # passenger
+        amount=-ride.price,  # negative amount for spending
+        description=f'Ride from {ride.pickup_location} to {ride.dropoff_location}',
+        pickup_location=ride.pickup_location,
+        dropoff_location=ride.dropoff_location
+    )
+    
+    # Create transaction for driver (positive amount for earning)
+    Transaction.objects.create(
+        user=ride.driver,  # driver
+        amount=ride.price,  # positive amount for earning
+        description=f'Ride from {ride.pickup_location} to {ride.dropoff_location}',
+        pickup_location=ride.pickup_location,
+        dropoff_location=ride.dropoff_location
+    )
+    
+    messages.success(request, 'Ride accepted successfully!')
+    return redirect('find_ride')
 
 @login_required
 def complete_ride(request, transaction_id):
@@ -392,3 +370,21 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, 'registration/signup.html', {'form': form})
+
+@login_required
+def current_journey(request, ride_id):
+    ride = get_object_or_404(Ride, id=ride_id)
+    
+    # Only allow access to the driver and passenger of this ride
+    if request.user != ride.driver and request.user != ride.passenger:
+        messages.error(request, 'You do not have permission to view this journey.')
+        return redirect('home')
+    
+    # Only show active rides
+    if ride.status != 'accepted':
+        messages.error(request, 'This ride is not currently active.')
+        return redirect('home')
+    
+    return render(request, 'main/current_journey.html', {
+        'ride': ride
+    })

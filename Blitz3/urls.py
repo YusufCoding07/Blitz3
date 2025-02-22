@@ -29,6 +29,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='home'), name='logout'),  # Add this line
     path('accept-ride/<int:ride_id>/', views.accept_ride, name='accept_ride'),
     path('signup/', views.signup, name='signup'),
+    path('journey/<int:ride_id>/', views.current_journey, name='current_journey'),
 ]
 
 # Add static and media URLs for development

@@ -5,6 +5,7 @@ from django.dispatch import receiver
 from cloudinary.models import CloudinaryField
 from django.utils import timezone
 from decimal import Decimal
+from django.db.models import Q
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -103,3 +104,11 @@ class Ride(models.Model):
 
     def __str__(self):
         return f"Ride from {self.pickup_location} to {self.dropoff_location} on {self.date}"
+
+class User(AbstractUser):
+    @property
+    def current_ride(self):
+        return Ride.objects.filter(
+            Q(driver=self) | Q(passenger=self),
+            status='accepted'
+        ).first()
