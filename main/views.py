@@ -140,22 +140,31 @@ def register(request):
         profile_form = UserProfileForm(request.POST, request.FILES)
         
         if form.is_valid() and profile_form.is_valid():
-            user = form.save()
-            profile = profile_form.save(commit=False)
-            profile.user = user
-            profile.save()
-            
-            username = form.cleaned_data.get('username')
-            messages.success(request, f'Account created for {username}!')
-            return redirect('login')
+            try:
+                with transaction.atomic():
+                    user = form.save()
+                    profile = profile_form.save(commit=False)
+                    profile.user = user
+                    profile.save()
+                    
+                    username = form.cleaned_data.get('username')
+                    messages.success(request, f'Account created for {username}!')
+                    return redirect('login')
+            except Exception as e:
+                messages.error(request, 'An error occurred while creating your account. Please try again.')
+                # If there was an error, delete the user if it was created
+                if 'user' in locals():
+                    user.delete()
     else:
         form = UserRegisterForm()
         profile_form = UserProfileForm()
     
-    return render(request, 'registration/signup.html', {
+    context = {
         'form': form,
         'profile_form': profile_form
-    })
+    }
+    
+    return render(request, 'registration/signup.html', context)
 
 # Login Page
 def login_view(request):
