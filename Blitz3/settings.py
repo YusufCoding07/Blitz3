@@ -236,3 +236,6 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Add this line to your settings.py
+AUTH_USER_MODEL = 'main.User'
